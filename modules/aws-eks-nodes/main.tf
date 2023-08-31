@@ -1,0 +1,58 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.12.0"
+    }
+    duplocloud = {
+      source  = "duplocloud/duplocloud"
+      version = "> 0.9.40"
+    }
+  }
+}
+
+data "aws_ami" "eks" {
+  most_recent      = true
+  owners           = ["602401143452"]
+
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-${var.eks_version}-*"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "duplocloud_asg_profile" "nxt" {
+  count                 = length(var.az_list)
+  zone                  = count.index
+  friendly_name         = "${var.prefix}${var.az_list[count.index]}"
+  image_id              = data.aws_ami.eks.id
+
+  tenant_id             = var.tenant_id
+  instance_count        = var.instance_count
+  min_instance_count    = var.min_instance_count
+  max_instance_count    = var.max_instance_count
+  capacity              = var.capacity
+  is_ebs_optimized      = var.is_ebs_optimized
+  encrypt_disk          = var.encrypt_disk
+
+  # these stay the same for autoscaling eks nodes
+  agent_platform        = 7
+  is_minion             = true
+  allocated_public_ip   = false
+  cloud                 = 0
+  is_cluster_autoscaled = true
+  metadata {
+    key   = "OsDiskSize"
+    value = tostring(var.os_disk_size)
+  }
+}
