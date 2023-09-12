@@ -18,7 +18,7 @@ data "aws_ami" "eks" {
   }
 }
 
-resource "duplocloud_asg_profile" "nxt" {
+resource "duplocloud_asg_profile" "nodes" {
   count                 = length(var.az_list)
   zone                  = count.index
   friendly_name         = "${var.prefix}${var.az_list[count.index]}"
