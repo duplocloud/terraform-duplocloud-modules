@@ -1,0 +1,6 @@
+useCertManager: true
+clusterOperator:
+  nodeSelector: &nodeSelector
+    tenantname: ${namespace}
+msgTopologyOperator:
+  nodeSelector: *nodeSelector

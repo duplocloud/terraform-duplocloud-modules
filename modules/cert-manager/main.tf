@@ -5,10 +5,10 @@ locals {
   }))
 }
 
-resource "helm_release" "github_actions_controller" {
-  name        = "github-actions-controller"
-  repository  = "https://actions-runner-controller.github.io/actions-runner-controller"
-  chart       = "github-actions-controller"
+resource "helm_release" "cert_manager" {
+  name        = "cert-manager"
+  repository  = "https://charts.jetstack.io"
+  chart       = "cert-manager"
   version     = var.version
   namespace   = local.namespace
   values = [

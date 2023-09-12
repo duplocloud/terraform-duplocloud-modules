@@ -1,0 +1,7 @@
+installCRDs: true
+nodeSelector: &nodeSelector
+  tenantname: ${namespace}
+webhook:
+  nodeSelector: *nodeSelector
+cainjector:
+  nodeSelector: *nodeSelector

@@ -5,10 +5,10 @@ locals {
   }))
 }
 
-resource "helm_release" "github_actions_controller" {
-  name        = "github-actions-controller"
-  repository  = "https://actions-runner-controller.github.io/actions-runner-controller"
-  chart       = "github-actions-controller"
+resource "helm_release" "rabbitmq-operator" {
+  name        = "rabbitmq-operator"
+  repository  = "oci://registry-1.docker.io/bitnamicharts"
+  chart       = "rabbitmq-cluster-operator"
   version     = var.version
   namespace   = local.namespace
   values = [
