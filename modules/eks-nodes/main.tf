@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.12.0"
-    }
-    duplocloud = {
-      source  = "duplocloud/duplocloud"
-      version = "> 0.9.40"
-    }
-  }
-}
-
 data "aws_ami" "eks" {
   most_recent      = true
   owners           = ["602401143452"]
@@ -50,6 +37,7 @@ resource "duplocloud_asg_profile" "nxt" {
   is_minion             = true
   allocated_public_ip   = false
   cloud                 = 0
+  use_launch_template   = true
   is_cluster_autoscaled = true
   metadata {
     key   = "OsDiskSize"
