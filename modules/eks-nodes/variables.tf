@@ -42,3 +42,8 @@ variable "encrypt_disk" {
   default = false
   type    = bool
 }
+variable "minion_tags" {
+  type = map(string)
+  description = "Tags to apply to the Duplo Minions"
+  default = {}
+}

@@ -1,3 +1,12 @@
+locals {
+  minion_tags = [
+    for k, v in var.minion_tags : {
+      key   = k
+      value = v
+    }
+  ]
+}
+
 data "aws_ami" "eks" {
   most_recent      = true
   owners           = ["602401143452"]
@@ -42,5 +51,12 @@ resource "duplocloud_asg_profile" "nodes" {
   metadata {
     key   = "OsDiskSize"
     value = tostring(var.os_disk_size)
+  }
+  dynamic "minion_tags" {
+    for_each = local.asg_minion_tags
+    content {
+      key   = minion_tags.value.key
+      value = minion_tags.value.value
+    }
   }
 }
