@@ -12,11 +12,7 @@ resource "helm_release" "cert_manager" {
   version     = var.version
   namespace   = local.namespace
   values = [
-    yamlencode(var.values),
     yamlencode(local.values),
+    yamlencode(var.values)
   ]
-  set {
-    name  = "nodeSelector.tenantname"
-    value = "duploservices-dev01"
-  }
 }
