@@ -53,7 +53,7 @@ resource "duplocloud_asg_profile" "nodes" {
     value = tostring(var.os_disk_size)
   }
   dynamic "minion_tags" {
-    for_each = local.asg_minion_tags
+    for_each = local.minion_tags
     content {
       key   = minion_tags.value.key
       value = minion_tags.value.value
