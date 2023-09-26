@@ -59,4 +59,7 @@ resource "duplocloud_asg_profile" "nodes" {
       value = minion_tags.value.value
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }

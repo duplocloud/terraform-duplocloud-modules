@@ -1,2 +1,0 @@
-nodeSelector:
-  tenantname: ${namespace}
