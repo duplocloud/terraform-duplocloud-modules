@@ -24,8 +24,8 @@ variable "tenant_id" {
 }
 
 module "asg" {
-  source  = "duplocloud/components/aws//modules/aws-eks-nodes"
-  version = "0.0.1"
+  source             = "../../modules/eks-nodes"
+  # version            = "0.0.10"
   tenant_id = var.tenant_id
   prefix = "fun-"
   instance_count = 1
