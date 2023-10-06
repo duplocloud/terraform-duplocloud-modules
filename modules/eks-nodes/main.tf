@@ -13,7 +13,7 @@ data "aws_ami" "eks" {
 
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${var.eks_version}-*"]
+    values = ["${vars.base_ami_name}-${var.eks_version}-*"]
   }
 
   filter {

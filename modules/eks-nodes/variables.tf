@@ -14,6 +14,10 @@ variable "az_list" {
   type    = list(string)
   description = "The letter at the end of the zone"
 }
+variable "base_ami_name" {
+  default = "amazon-eks-node"
+  type    = string
+}
 variable "capacity" {
   default = "t3.medium"
   type    = string
