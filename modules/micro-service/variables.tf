@@ -40,9 +40,9 @@ variable "pod_config" {
     Annotations = optional(map(string))
     Labels = optional(map(string))
     RestartPolicy = optional(string)
-    PodSecurityContext = optional(object(any))
-    Volumes = optional(list(object(any)))
-    DeploymentStrategy = optional(object(any))
+    PodSecurityContext = optional(any)
+    Volumes = optional(list(any))
+    DeploymentStrategy = optional(any)
   })
   default = {}
 }
