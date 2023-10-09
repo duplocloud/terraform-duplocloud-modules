@@ -1,0 +1,64 @@
+name: Test Modules
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  tfmodule:
+    name: Testing ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+        - eks-nodes
+        - micro-service
+        - standalone-alb
+        - tenant-role-extension
+    env:
+      MODULE_DIR: ./modules/${{ matrix.module }}
+      EXAMPLE_DIR: ./examples/${{ matrix.module }}
+      DUPLO_TOKEN: ${{ secrets.DUPLO_TOKEN }}
+      DUPLO_HOST: ${{ vars.DUPLO_HOST }}
+      DUPLO_TENANT: ${{ vars.DUPLO_TENANT }}
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout source code
+
+    # - uses: actions/cache@v3
+    #   name: Cache plugin dir
+    #   with:
+    #     path: ~/.tflint.d/plugins
+    #     key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v3
+      name: Setup TFLint
+      with:
+        tflint_version: v0.44.1
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Show versions
+      run: |
+        terraform version
+        tflint --version
+
+    - name: TF Validate Module
+      uses: ./.github/actions/tf_validate
+      with:
+        wkdir: ${{ env.MODULE_DIR }}
+
+    - name: TF Validate Example for Module
+      uses: ./.github/actions/tf_validate
+      with:
+        wkdir: ${{ env.EXAMPLE_DIR }}
+
+    - name: Plan the Example
+      working-directory: ${{ env.EXAMPLE_DIR }}
+      run: terraform plan
+      env:
+        duplo_token: ${{ env.DUPLO_TOKEN }}
+        duplo_host: ${{ env.DUPLO_HOST }}
+        TF_VAR_tenant_name: ${{ env.DUPLO_TENANT }}
