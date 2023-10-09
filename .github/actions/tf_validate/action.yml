@@ -1,0 +1,30 @@
+name: Validate Module
+description: Test a single Terraform module
+inputs:
+  wkdir: 
+    description: Working directory
+    required: true
+runs:
+  using: composite
+  steps:
+
+  - name: TF Init Module
+    shell: bash
+    working-directory: ${{ inputs.wkdir }}
+    run: terraform init
+
+  - name: Init TFLint
+    shell: bash
+    run: tflint --init
+    working-directory: ${{ inputs.wkdir }}
+
+  - name: TF Validate Module
+    shell: bash
+    working-directory: ${{ inputs.wkdir }}
+    run: terraform validate
+
+  - name: Run TFLint
+    shell: bash
+    working-directory: ${{ inputs.wkdir }}
+    run: tflint
+
