@@ -35,24 +35,24 @@ variable "lb_config" {
   })
 }
 
-variable "pod_config" {
-  type = object({
-    Annotations = optional(map(string))
-    Labels = optional(map(string))
-    RestartPolicy = optional(string)
-    PodSecurityContext = optional(any)
-    Volumes = optional(list(any))
-    DeploymentStrategy = optional(any)
-  })
-  default = {}
-}
+# variable "pod_config" {
+#   type = object({
+#     Annotations = optional(map(string))
+#     Labels = optional(map(string))
+#     RestartPolicy = optional(string)
+#     PodSecurityContext = optional(any)
+#     Volumes = optional(list(any))
+#     DeploymentStrategy = optional(any)
+#   })
+#   default = {}
+# }
 
-variable "container_config" {
-  type = object({
-    Resources = optional(object({
-      limits = optional(map(string))
-      requests = optional(map(string))
-    }))
-  })
-  default = {}
-}
+# variable "container_config" {
+#   type = object({
+#     Resources = optional(object({
+#       limits = optional(map(string))
+#       requests = optional(map(string))
+#     }))
+#   })
+#   default = {}
+# }
