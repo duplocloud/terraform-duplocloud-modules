@@ -9,13 +9,17 @@ terraform {
 }
 provider "duplocloud" {}
 
-variable "tenant_id" {
-  type = string
+data "duplocloud_tenant" "current" {
+  name = "tf-tests"
+}
+
+data "duplocloud_infrastructure" "current" {
+  tenant_id = data.duplocloud_tenant.current.id
 }
 
 module "some_service" {
   source = "../../modules/micro-service"
-  tenant_id = var.tenant_id
+  tenant_id = data.duplocloud_tenant.current.id
   name = "some-service"
   image = "nginx:latest"
   lb_config = {

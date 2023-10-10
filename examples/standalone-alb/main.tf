@@ -14,7 +14,7 @@ provider "duplocloud" {
 }
 
 data "duplocloud_tenant" "current" {
-  name = "auto-02"
+  name = "tf-tests"
 }
 
 data "duplocloud_infrastructure" "current" {

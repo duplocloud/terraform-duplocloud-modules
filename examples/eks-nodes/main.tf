@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.12.0"
+      version = "~> 5.20.0"
     }
     duplocloud = {
       source  = "duplocloud/duplocloud"
@@ -20,14 +20,14 @@ provider "duplocloud" {
 
 }
 
-variable "tenant_id" {
-  type = string
+data "duplocloud_tenant" "current" {
+  name = "tf-tests"
 }
 
 module "asg" {
   source             = "../../modules/eks-nodes"
   # version            = "0.0.10"
-  tenant_id = var.tenant_id
+  tenant_id = data.duplocloud_tenant.current.id
   prefix = "fun-"
   instance_count = 1
   min_instance_count = 1
