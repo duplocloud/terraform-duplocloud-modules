@@ -39,8 +39,8 @@ runs:
     name: Configure AWS IAM Credentials
     id: aws-iam
     uses: aws-actions/configure-aws-credentials@v2
-    with:
-      aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-      aws-session-token: ${{ env.AWS_SESSION_TOKEN }}
-      aws-region: ${{ env.AWS_REGION }}
+    # with:
+    #   aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+    #   aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #   aws-session-token: ${{ env.AWS_SESSION_TOKEN }}
+    #   aws-region: ${{ env.AWS_REGION }}
