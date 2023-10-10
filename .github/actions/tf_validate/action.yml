@@ -4,6 +4,9 @@ inputs:
   wkdir: 
     description: Working directory
     required: true
+  gha_token:
+    description: GitHub token
+    required: true
 runs:
   using: composite
   steps:
@@ -15,7 +18,7 @@ runs:
 
   - name: Init TFLint
     shell: bash
-    run: tflint --init
+    run: tflint --init -c ../../.tflint.hcl
     working-directory: ${{ inputs.wkdir }}
 
   - name: TF Validate Module
@@ -26,5 +29,12 @@ runs:
   - name: Run TFLint
     shell: bash
     working-directory: ${{ inputs.wkdir }}
-    run: tflint
+    run: tflint -c ../../.tflint.hcl
+    env:
+      GITHUB_TOKEN: ${{ input.gha_token }}
+
+  - name: Validate Format
+    shell: bash
+    working-directory: ${{ inputs.wkdir }}
+    run: terraform fmt -check=true -diff=true -recursive
 

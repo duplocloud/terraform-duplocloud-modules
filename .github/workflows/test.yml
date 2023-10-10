@@ -52,11 +52,13 @@ jobs:
       uses: ./.github/actions/tf_validate
       with:
         wkdir: ${{ env.MODULE_DIR }}
+        gha_token: ${{ github.token }}
 
     - name: TF Validate Example for Module
       uses: ./.github/actions/tf_validate
       with:
         wkdir: ${{ env.EXAMPLE_DIR }}
+        gha_token: ${{ github.token }}
 
     - name: Test Module
       working-directory: ${{ env.MODULE_DIR }}

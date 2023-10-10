@@ -25,14 +25,14 @@ data "duplocloud_tenant" "current" {
 }
 
 module "asg" {
-  source             = "../../modules/eks-nodes"
+  source = "../../modules/eks-nodes"
   # version            = "0.0.10"
-  tenant_id = data.duplocloud_tenant.current.id
-  prefix = "fun-"
-  instance_count = 1
+  tenant_id          = data.duplocloud_tenant.current.id
+  prefix             = "fun-"
+  instance_count     = 1
   min_instance_count = 1
   max_instance_count = 1
-  capacity = "m5.large"
-  os_disk_size = 20
-  eks_version = "1.24"
+  capacity           = "m5.large"
+  os_disk_size       = 20
+  eks_version        = "1.24"
 }
