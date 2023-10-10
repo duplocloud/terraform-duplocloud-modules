@@ -31,7 +31,7 @@ runs:
     working-directory: ${{ inputs.wkdir }}
     run: tflint -c ../../.tflint.hcl
     env:
-      GITHUB_TOKEN: ${{ input.gha_token }}
+      GITHUB_TOKEN: ${{ inputs.gha_token }}
 
   - name: Validate Format
     shell: bash
