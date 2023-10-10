@@ -11,27 +11,27 @@ variable "image" {
 }
 
 variable "replicas" {
-  type = number
+  type    = number
   default = 1
 }
 
 variable "env" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 
 variable "env_secrets" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "lb_config" {
   type = object({
-    priority = optional(number, 0)
-    path_pattern = string
+    priority         = optional(number, 0)
+    path_pattern     = string
     health_check_url = string
-    listener_arn = string
-    port = number
+    listener_arn     = string
+    port             = number
   })
 }
 

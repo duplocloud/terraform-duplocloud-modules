@@ -21,11 +21,11 @@ resource "duplocloud_duplo_service" "this" {
   other_docker_config = jsonencode({
     EnvFrom = concat([
       {
-          "configMapRef" : {
-            "name" : duplocloud_k8_config_map.this.name
-          }
+        "configMapRef" : {
+          "name" : duplocloud_k8_config_map.this.name
         }
-    ],[
+      }
+      ], [
       for secret in var.env_secrets : {
         secretRef : {
           name = secret
@@ -92,7 +92,7 @@ resource "duplocloud_aws_lb_listener_rule" "this" {
       values = [var.lb_config.path_pattern]
     }
   }
-  depends_on = [ 
+  depends_on = [
     duplocloud_duplo_service_lbconfigs.this
   ]
 }

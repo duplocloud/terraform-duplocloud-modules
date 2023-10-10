@@ -14,15 +14,15 @@ data "duplocloud_tenant" "current" {
 }
 
 module "some_service" {
-  source = "../../modules/micro-service"
+  source    = "../../modules/micro-service"
   tenant_id = data.duplocloud_tenant.current.id
-  name = "some-service"
-  image = "nginx:latest"
+  name      = "some-service"
+  image     = "nginx:latest"
   lb_config = {
     health_check_url = "/"
-    listener_arn = "somearn"
-    path_pattern = "/*"
-    port = 80
-    priority = 1
+    listener_arn     = "somearn"
+    path_pattern     = "/*"
+    port             = 80
+    priority         = 1
   }
 }

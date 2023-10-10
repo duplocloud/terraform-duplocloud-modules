@@ -5,7 +5,7 @@ variable "tenant_name" {
 
 variable "iam_policy_json" {
   description = "The IAM policy JSON which has the extra policies granted to the tenant role"
-  type = string
+  type        = string
 }
 
 variable "policy_name" {
