@@ -3,15 +3,15 @@ variable "tenant_id" {
 }
 variable "prefix" {
   default = "apps-"
-  type = string
+  type    = string
 }
 variable "eks_version" {
-  type = string
+  type    = string
   default = "1.24"
 }
 variable "az_list" {
-  default = ["a", "b"]
-  type    = list(string)
+  default     = ["a", "b"]
+  type        = list(string)
   description = "The letter at the end of the zone"
 }
 variable "base_ami_name" {
@@ -47,7 +47,7 @@ variable "encrypt_disk" {
   type    = bool
 }
 variable "minion_tags" {
-  type = map(string)
+  type        = map(string)
   description = "Tags to apply to the Duplo Minions"
-  default = {}
+  default     = {}
 }

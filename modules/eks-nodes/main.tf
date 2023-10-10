@@ -8,8 +8,8 @@ locals {
 }
 
 data "aws_ami" "eks" {
-  most_recent      = true
-  owners           = ["602401143452"]
+  most_recent = true
+  owners      = ["602401143452"]
 
   filter {
     name   = "name"
@@ -28,18 +28,18 @@ data "aws_ami" "eks" {
 }
 
 resource "duplocloud_asg_profile" "nodes" {
-  count                 = length(var.az_list)
-  zone                  = count.index
-  friendly_name         = "${var.prefix}${var.az_list[count.index]}"
-  image_id              = data.aws_ami.eks.id
+  count         = length(var.az_list)
+  zone          = count.index
+  friendly_name = "${var.prefix}${var.az_list[count.index]}"
+  image_id      = data.aws_ami.eks.id
 
-  tenant_id             = var.tenant_id
-  instance_count        = var.instance_count
-  min_instance_count    = var.min_instance_count
-  max_instance_count    = var.max_instance_count
-  capacity              = var.capacity
-  is_ebs_optimized      = var.is_ebs_optimized
-  encrypt_disk          = var.encrypt_disk
+  tenant_id          = var.tenant_id
+  instance_count     = var.instance_count
+  min_instance_count = var.min_instance_count
+  max_instance_count = var.max_instance_count
+  capacity           = var.capacity
+  is_ebs_optimized   = var.is_ebs_optimized
+  encrypt_disk       = var.encrypt_disk
 
   # these stay the same for autoscaling eks nodes
   agent_platform        = 7
