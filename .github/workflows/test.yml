@@ -23,6 +23,7 @@ jobs:
       DUPLO_HOST: ${{ vars.DUPLO_HOST }}
       DUPLO_TENANT: ${{ vars.DUPLO_TENANT }}
       TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+      TF_LOCKFILE: ./modules/${{ matrix.module }}/.terraform.lock.hcl
     steps:
     - uses: actions/checkout@v3
       name: Checkout source code
@@ -52,8 +53,9 @@ jobs:
     - name: Cache TF Plugins
       uses: actions/cache@v3
       with:
-        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-        key: terraform-plugin-cache
+        path: |
+          ${{ env.TF_PLUGIN_CACHE_DIR }}
+        key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
     - name: Cache TFlint Plugins
       uses: actions/cache@v3
