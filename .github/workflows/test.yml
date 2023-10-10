@@ -46,7 +46,7 @@ jobs:
     - name: Configure Terraform Plugin Cache
       run: |
         mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-        echo "plugin_cache_dir = '${TF_PLUGIN_CACHE_DIR}'" > ~/.terraformrc
+        echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
         cat ~/.terraformrc
 
     - name: Cache TF Plugins
