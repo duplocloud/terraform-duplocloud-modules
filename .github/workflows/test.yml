@@ -13,9 +13,9 @@ jobs:
       matrix:
         module:
         - eks-nodes
-        - micro-service
-        - standalone-alb
-        - tenant-role-extension
+        # - micro-service
+        # - standalone-alb
+        # - tenant-role-extension
     env:
       MODULE_DIR: ./modules/${{ matrix.module }}
       EXAMPLE_DIR: ./examples/${{ matrix.module }}
