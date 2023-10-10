@@ -40,6 +40,9 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
+    - name: Setup Duplo and AWS
+      uses: ./.github/actions/setup_aws
+
     - name: Show versions
       run: |
         terraform version
