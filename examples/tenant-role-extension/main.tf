@@ -11,6 +11,15 @@ terraform {
     }
   }
 }
+
+provider "duplocloud" {
+
+}
+
+provider "aws" {
+  region = "us-west-2"
+}
+
 locals {
   my_secrets_prefix = "SecretSauce"
   tenant_name       = "dev01"
