@@ -64,7 +64,6 @@ jobs:
       env:
         duplo_token: ${{ env.DUPLO_TOKEN }}
         duplo_host: ${{ env.DUPLO_HOST }}
-        TF_VAR_tenant_name: ${{ env.DUPLO_TENANT }}
 
     - name: Plan the Example
       working-directory: ${{ env.EXAMPLE_DIR }}
