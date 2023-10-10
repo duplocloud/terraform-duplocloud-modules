@@ -1,8 +1,5 @@
 run "validate_name" {
   command = plan
-  module {
-    source = "./"
-  }
   variables {
     tenant_id = "dad12b90-b1ee-43fc-8b13-eef2bb7a0fcf"
   }
