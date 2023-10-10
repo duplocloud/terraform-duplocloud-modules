@@ -1,12 +1,10 @@
-
-data "duplocloud_tenant" "current" {
-  name = "tf-tests"
-}
-
 run "validate_name" {
   command = plan
+  module {
+    source = "./"
+  }
   variables {
-    tenant_id = data.duplocloud_tenant.current.id
+    tenant_id = "dad12b90-b1ee-43fc-8b13-eef2bb7a0fcf"
   }
   assert {
     condition     = duplocloud_asg_profile.nodes[0].friendly_name == "apps-a"
