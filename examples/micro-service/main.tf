@@ -13,10 +13,6 @@ data "duplocloud_tenant" "current" {
   name = "tf-tests"
 }
 
-data "duplocloud_infrastructure" "current" {
-  tenant_id = data.duplocloud_tenant.current.id
-}
-
 module "some_service" {
   source = "../../modules/micro-service"
   tenant_id = data.duplocloud_tenant.current.id
