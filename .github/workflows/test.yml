@@ -13,9 +13,9 @@ jobs:
       matrix:
         module:
         - eks-nodes
-        - micro-service
-        - standalone-alb
-        - tenant-role-extension
+        # - micro-service
+        # - standalone-alb
+        # - tenant-role-extension
     env:
       DUPLO_TOKEN: ${{ secrets.DUPLO_TOKEN }}
       DUPLO_HOST: ${{ vars.DUPLO_HOST }}

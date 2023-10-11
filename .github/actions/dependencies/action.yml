@@ -22,4 +22,39 @@ runs:
     id: install-aws-cli
     uses: unfor19/install-aws-cli-action@v1
 
-  
+  - name: Setup TFLint
+    uses: terraform-linters/setup-tflint@v3
+    with:
+      tflint_version: v0.44.1
+
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v2
+
+  - name: Show versions
+    shell: bash
+    run: |
+      terraform version
+      tflint --version
+      aws --version
+
+  # - name: Configure Terraform Plugin Cache
+  #   shell: bash
+  #   env:
+  #     TF_PLUGIN_CACHE_DIR: ${{ inputs.tf_cache_dir }}
+  #   run: |
+  #     mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+  #     echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
+  #     cat ~/.terraformrc
+  #     echo "TF_PLUGIN_CACHE_DIR=${TF_PLUGIN_CACHE_DIR}" >> $GITHUB_ENV
+
+  # - name: Cache TF Plugins
+  #   uses: actions/cache@v3
+  #   with:
+  #     path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+  #     key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
+
+  # - name: Cache TFlint Plugins
+  #   uses: actions/cache@v3
+  #   with:
+  #     path: ~/.tflint.d/plugins
+  #     key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
