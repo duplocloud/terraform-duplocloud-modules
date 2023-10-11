@@ -1,7 +1,7 @@
 run "validate_name" {
   command = plan
   variables {
-    tenant_id = "dad12b90-b1ee-43fc-8b13-eef2bb7a0fcf"
+    tenant_id = "0a09ca25-7f0d-4f5f-b9fa-62290273d192"
   }
   assert {
     condition     = duplocloud_asg_profile.nodes[0].friendly_name == "apps-a"

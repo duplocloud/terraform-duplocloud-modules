@@ -53,8 +53,7 @@ jobs:
     - name: Cache TF Plugins
       uses: actions/cache@v3
       with:
-        path: |
-          ${{ env.TF_PLUGIN_CACHE_DIR }}
+        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
         key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
     - name: Cache TFlint Plugins
