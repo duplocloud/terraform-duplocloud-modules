@@ -33,11 +33,11 @@ jobs:
             fi
           fi
         done
-        echo "Modules to test: ${MODULES[@]}"
         matrix_list=$(printf ",\"%s\"" "${MODULES[@]}")
         matrix_list=${matrix_list:1}
         export MATRIX='{"module": ['$matrix_list']}'
         echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+        echo "Modules to test: ${MODULES[@]}" >> $GITHUB_STEP_SUMMARY
   tfmodule:
     name: Testing ${{ matrix.module }}
     runs-on: ubuntu-latest
