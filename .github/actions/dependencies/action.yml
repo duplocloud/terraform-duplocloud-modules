@@ -40,18 +40,19 @@ runs:
   - name: Configure Terraform Plugin Cache
     shell: bash
     env:
-      TF_PLUGIN_CACHE_DIR: ${{ inputs.tf_cache_dir }}
+      INPUT_CACHE_DIR: ${{ inputs.tf_cache_dir }}
     run: |
-      mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-      echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
+      mkdir -p "${INPUT_CACHE_DIR}"
+      export TF_PLUGIN_CACHE_DIR=$(realpath "${INPUT_CACHE_DIR}")
+      echo "plugin_cache_dir = \"${real_dir}\"" > ~/.terraformrc
       cat ~/.terraformrc
       echo "TF_PLUGIN_CACHE_DIR=${TF_PLUGIN_CACHE_DIR}" >> $GITHUB_ENV
 
-  # - name: Cache TF Plugins
-  #   uses: actions/cache@v3
-  #   with:
-  #     path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-  #     key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
+  - name: Cache TF Plugins
+    uses: actions/cache@v3
+    with:
+      path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+      key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
   # - name: Cache TFlint Plugins
   #   uses: actions/cache@v3
