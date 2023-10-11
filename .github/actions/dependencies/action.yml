@@ -30,12 +30,12 @@ runs:
   - name: Setup Terraform
     uses: hashicorp/setup-terraform@v2
 
-  # - name: Show versions
-  #   shell: bash
-  #   run: |
-  #     terraform version
-  #     tflint --version
-  #     aws --version
+  - name: Show versions
+    shell: bash
+    run: |
+      terraform version
+      tflint --version
+      aws --version
 
   # - name: Configure Terraform Plugin Cache
   #   shell: bash
