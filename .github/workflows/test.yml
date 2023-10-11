@@ -29,8 +29,8 @@ jobs:
     - name: Install Dependencies
       uses: ./.github/actions/dependencies
 
-    # - name: Login AWS
-    #   uses: ./.github/actions/setup_aws
+    - name: Login AWS
+      uses: ./.github/actions/setup_aws
 
     # - name: TF Validate Module
     #   uses: ./.github/actions/tf_validate
