@@ -26,7 +26,6 @@ jobs:
           IFS='/' read -ra parts <<< "$file"
           base_folder="${parts[0]}"
           module_name="${parts[1]}"
-          # if base folder is modules
           if [ "$base_folder" == "modules" ]; then
             if [[ ! " ${MODULES[@]} " =~ " ${module_name} " ]]; then
               MODULES+=("$module_name")
@@ -34,7 +33,6 @@ jobs:
             fi
           fi
         done
-        # MODULES=(eks-nodes micro-service standalone-alb tenant-role-extension)
         echo "Modules to test: ${MODULES[@]}"
         matrix_list=$(printf ",\"%s\"" "${MODULES[@]}")
         matrix_list=${matrix_list:1}

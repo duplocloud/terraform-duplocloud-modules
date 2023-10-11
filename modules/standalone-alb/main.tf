@@ -10,7 +10,7 @@ resource "duplocloud_aws_load_balancer" "standalone" {
   idle_timeout         = var.timeout
 }
 
-# duplo bug prevents deletion of target group, so it must prefix custom-
+# duplo bug prevents deletion of target group, it must prefix custom-
 resource "duplocloud_aws_lb_target_group" "default" {
   tenant_id   = var.tenant_id
   name        = "custom-${var.name}"
