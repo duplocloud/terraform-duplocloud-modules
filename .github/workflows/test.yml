@@ -20,28 +20,11 @@ jobs:
       DUPLO_TOKEN: ${{ secrets.DUPLO_TOKEN }}
       DUPLO_HOST: ${{ vars.DUPLO_HOST }}
       DUPLO_TENANT: ${{ vars.DUPLO_TENANT }}
-      # TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
       TF_LOCKFILE: ./modules/${{ matrix.module }}/.terraform.lock.hcl
     steps:
 
     - uses: actions/checkout@v3
       name: Checkout source code
 
-    - name: Install Dependencies
-      uses: ./.github/actions/dependencies
-
-    # - name: Login AWS
-    #   uses: ./.github/actions/setup_aws
-
-    # - name: TF Validate Module
-    #   uses: ./.github/actions/tf_validate
-    #   with:
-    #     wkdir: ./modules/${{ matrix.module }}
-    #     gha_token: ${{ github.token }}
-
-    # - name: TF Validate Example for Module
-    #   uses: ./.github/actions/tf_validate
-    #   with:
-    #     wkdir: ./examples/${{ matrix.module }}
-    #     gha_token: ${{ github.token }}
+    
 
