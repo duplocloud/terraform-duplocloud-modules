@@ -23,7 +23,7 @@ jobs:
         MODULES=()
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
-          IFS='/' read -ra parts <<< "$thedir"
+          IFS='/' read -ra parts <<< "$file"
           base_folder="${parts[0]}"
           module_name="${parts[1]}"
           # if base folder is modules

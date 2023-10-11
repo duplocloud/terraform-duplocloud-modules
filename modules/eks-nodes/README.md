@@ -27,6 +27,11 @@ Run the unit tests with:
 terraform test -filter=tests/unit.tftests.hcl
 ```
 
+Run the integration tests with: 
+```sh
+terraform test -filter=tests/integration.tftests.hcl
+```
+
 ## References  
   - [Duploclud Hosts](https://docs.duplocloud.com/docs/azure/use-cases/hosts-vms)
   - [Duplocloud ASG](https://docs.duplocloud.com/docs/aws/use-cases/auto-scaling/auto-scaling-groups)
