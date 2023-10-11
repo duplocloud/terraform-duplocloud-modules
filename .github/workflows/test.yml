@@ -17,74 +17,31 @@ jobs:
         - standalone-alb
         - tenant-role-extension
     env:
-      MODULE_DIR: ./modules/${{ matrix.module }}
-      EXAMPLE_DIR: ./examples/${{ matrix.module }}
       DUPLO_TOKEN: ${{ secrets.DUPLO_TOKEN }}
       DUPLO_HOST: ${{ vars.DUPLO_HOST }}
       DUPLO_TENANT: ${{ vars.DUPLO_TENANT }}
-      TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+      # TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
       TF_LOCKFILE: ./modules/${{ matrix.module }}/.terraform.lock.hcl
     steps:
+
     - uses: actions/checkout@v3
       name: Checkout source code
 
-    - uses: terraform-linters/setup-tflint@v3
-      name: Setup TFLint
-      with:
-        tflint_version: v0.44.1
+    - name: Install Dependencies
+      uses: ./.github/actions/dependencies
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-
-    - name: Setup Duplo and AWS
+    - name: Login AWS
       uses: ./.github/actions/setup_aws
-
-    - name: Show versions
-      run: |
-        terraform version
-        tflint --version
-
-    - name: Configure Terraform Plugin Cache
-      run: |
-        mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-        echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
-        cat ~/.terraformrc
-
-    - name: Cache TF Plugins
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-        key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
-
-    - name: Cache TFlint Plugins
-      uses: actions/cache@v3
-      with:
-        path: ~/.tflint.d/plugins
-        key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
 
     - name: TF Validate Module
       uses: ./.github/actions/tf_validate
       with:
-        wkdir: ${{ env.MODULE_DIR }}
+        wkdir: ./modules/${{ matrix.module }}
         gha_token: ${{ github.token }}
 
     - name: TF Validate Example for Module
       uses: ./.github/actions/tf_validate
       with:
-        wkdir: ${{ env.EXAMPLE_DIR }}
+        wkdir: ./examples/${{ matrix.module }}
         gha_token: ${{ github.token }}
 
-    - name: Test Module
-      working-directory: ${{ env.MODULE_DIR }}
-      run: terraform test
-      env:
-        duplo_token: ${{ env.DUPLO_TOKEN }}
-        duplo_host: ${{ env.DUPLO_HOST }}
-
-    - name: Plan the Example
-      working-directory: ${{ env.EXAMPLE_DIR }}
-      run: terraform plan
-      env:
-        duplo_token: ${{ env.DUPLO_TOKEN }}
-        duplo_host: ${{ env.DUPLO_HOST }}
-        TF_VAR_tenant_name: ${{ env.DUPLO_TENANT }}

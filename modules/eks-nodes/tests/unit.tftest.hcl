@@ -1,3 +1,4 @@
+# only do plans here
 run "validate_name" {
   command = plan
   variables {

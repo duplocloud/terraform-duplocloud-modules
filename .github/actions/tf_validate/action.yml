@@ -7,6 +7,14 @@ inputs:
   gha_token:
     description: GitHub token
     required: true
+  plan:
+    description: Plan the module
+    required: false
+    default: "true"
+  test:
+    description: Test the module
+    required: false
+    default: "true"
 runs:
   using: composite
   steps:
@@ -18,8 +26,8 @@ runs:
 
   - name: Init TFLint
     shell: bash
-    run: tflint --init -c ../../.tflint.hcl
     working-directory: ${{ inputs.wkdir }}
+    run: tflint --init -c ../../.tflint.hcl
 
   - name: TF Validate Module
     shell: bash
@@ -30,11 +38,29 @@ runs:
     shell: bash
     working-directory: ${{ inputs.wkdir }}
     run: tflint -c ../../.tflint.hcl
-    env:
-      GITHUB_TOKEN: ${{ inputs.gha_token }}
+    # env:
+    #   GITHUB_TOKEN: ${{ inputs.gha_token }}
 
   - name: Validate Format
     shell: bash
     working-directory: ${{ inputs.wkdir }}
     run: terraform fmt -check=true -diff=true -recursive
 
+  - name: Plan the Example
+    if: ${{ inputs.plan == 'true' }}
+    working-directory: ${{ inputs.wkdir }}
+    shell: bash
+    run: terraform plan
+    env:
+      duplo_token: ${{ env.DUPLO_TOKEN }}
+      duplo_host: ${{ env.DUPLO_HOST }}
+      # TF_VAR_tenant_name: ${{ env.DUPLO_TENANT }}
+
+  - name: Test Module
+    if: ${{ inputs.test == 'true' }}
+    working-directory: ${{ env.MODULE_DIR }}
+    shell: bash
+    run: terraform test
+    env:
+      duplo_token: ${{ env.DUPLO_TOKEN }}
+      duplo_host: ${{ env.DUPLO_HOST }}
