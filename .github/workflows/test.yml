@@ -20,10 +20,22 @@ jobs:
     - name: Make a Matrx Output
       id: matrix
       run: |
+        MODULES=()
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
+          IFS='/' read -ra parts <<< "$thedir"
+          base_folder="${parts[0]}"
+          module_name="${parts[1]}"
+          # if base folder is modules
+          if [ "$base_folder" == "modules" ]; then
+            if [[ ! " ${MODULES[@]} " =~ " ${module_name} " ]]; then
+              MODULES+=("$module_name")
+              echo "Adding $module_name for testing"
+            fi
+          fi
         done
-        MODULES=(eks-nodes micro-service standalone-alb tenant-role-extension)
+        # MODULES=(eks-nodes micro-service standalone-alb tenant-role-extension)
+        echo "Modules to test: ${MODULES[@]}"
         matrix_list=$(printf ",\"%s\"" "${MODULES[@]}")
         matrix_list=${matrix_list:1}
         export MATRIX='{"module": ['$matrix_list']}'

@@ -20,6 +20,13 @@ module "nodegroup" {
 }
 ```
 
+## Testing  
+
+Run the unit tests with: 
+```sh
+terraform test -filter=tests/unit.tftests.hcl
+```
+
 ## References  
   - [Duploclud Hosts](https://docs.duplocloud.com/docs/azure/use-cases/hosts-vms)
   - [Duplocloud ASG](https://docs.duplocloud.com/docs/aws/use-cases/auto-scaling/auto-scaling-groups)
