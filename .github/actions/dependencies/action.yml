@@ -37,21 +37,21 @@ runs:
       tflint --version
       aws --version
 
-  - name: Configure Terraform Plugin Cache
-    shell: bash
-    env:
-      TF_PLUGIN_CACHE_DIR: ${{ inputs.tf_cache_dir }}
-    run: |
-      mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-      echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
-      cat ~/.terraformrc
-      echo "TF_PLUGIN_CACHE_DIR=${TF_PLUGIN_CACHE_DIR}" >> $GITHUB_ENV
+  # - name: Configure Terraform Plugin Cache
+  #   shell: bash
+  #   env:
+  #     TF_PLUGIN_CACHE_DIR: ${{ inputs.tf_cache_dir }}
+  #   run: |
+  #     mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+  #     echo "plugin_cache_dir = \"${TF_PLUGIN_CACHE_DIR}\"" > ~/.terraformrc
+  #     cat ~/.terraformrc
+  #     echo "TF_PLUGIN_CACHE_DIR=${TF_PLUGIN_CACHE_DIR}" >> $GITHUB_ENV
 
-  - name: Cache TF Plugins
-    uses: actions/cache@v3
-    with:
-      path: ${{ inputs.tf_cache_dir }}
-      key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
+  # - name: Cache TF Plugins
+  #   uses: actions/cache@v3
+  #   with:
+  #     path: ${{ inputs.tf_cache_dir }}
+  #     key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
   - name: Cache TFlint Plugins
     uses: actions/cache@v3
