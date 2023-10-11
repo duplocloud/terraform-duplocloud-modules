@@ -12,10 +12,19 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v39
     - name: Make a Matrx Output
       id: matrix
       run: |
-        export MATRIX='{"module": ["eks-nodes", "micro-service", "standalone-alb", "tenant-role-extension"]}'
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
+        done
+        MODULES=(eks-nodes micro-service standalone-alb tenant-role-extension)
+        matrix_list=$(printf ",\"%s\"" "${foo[@]}")
+        matrix_list=${matrix_list:1}
+        export MATRIX='{"module": ['$matrix_list']}'
         echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
   tfmodule:
     name: Testing ${{ matrix.module }}
