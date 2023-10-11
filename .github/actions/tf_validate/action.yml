@@ -58,7 +58,7 @@ runs:
 
   - name: Test Module
     if: ${{ inputs.test == 'true' }}
-    working-directory: ${{ env.MODULE_DIR }}
+    working-directory: ${{ inputs.wkdir }}
     shell: bash
     run: terraform test
     env:
