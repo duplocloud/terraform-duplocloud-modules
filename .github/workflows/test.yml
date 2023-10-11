@@ -24,7 +24,7 @@ jobs:
           echo "$file was changed"
         done
         MODULES=(eks-nodes micro-service standalone-alb tenant-role-extension)
-        matrix_list=$(printf ",\"%s\"" "${foo[@]}")
+        matrix_list=$(printf ",\"%s\"" "${MODULES[@]}")
         matrix_list=${matrix_list:1}
         export MATRIX='{"module": ['$matrix_list']}'
         echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
