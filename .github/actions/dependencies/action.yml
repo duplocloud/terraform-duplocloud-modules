@@ -48,14 +48,14 @@ runs:
       cat ~/.terraformrc
       echo "TF_PLUGIN_CACHE_DIR=${TF_PLUGIN_CACHE_DIR}" >> $GITHUB_ENV
 
-  # - name: Cache TF Plugins
-  #   uses: actions/cache@v3
-  #   with:
-  #     path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-  #     key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
+  - name: Cache TF Plugins
+    uses: actions/cache@v3
+    with:
+      path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+      key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
-  # - name: Cache TFlint Plugins
-  #   uses: actions/cache@v3
-  #   with:
-  #     path: ~/.tflint.d/plugins
-  #     key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
+  - name: Cache TFlint Plugins
+    uses: actions/cache@v3
+    with:
+      path: ~/.tflint.d/plugins
+      key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
