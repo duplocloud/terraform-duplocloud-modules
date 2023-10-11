@@ -46,11 +46,11 @@ runs:
     working-directory: ${{ inputs.wkdir }}
     run: terraform fmt -check=true -diff=true -recursive
 
-  - name: Plan the Example
+  - name: Plan Module
     if: ${{ inputs.plan == 'true' }}
     working-directory: ${{ inputs.wkdir }}
     shell: bash
-    run: terraform plan
+    run: terraform plan -input=false
     env:
       duplo_token: ${{ env.DUPLO_TOKEN }}
       duplo_host: ${{ env.DUPLO_HOST }}

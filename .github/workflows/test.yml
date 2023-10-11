@@ -37,6 +37,7 @@ jobs:
       with:
         wkdir: ./modules/${{ matrix.module }}
         gha_token: ${{ github.token }}
+        plan: false
 
     # - name: TF Validate Example for Module
     #   uses: ./.github/actions/tf_validate
