@@ -30,12 +30,12 @@ runs:
   - name: Setup Terraform
     uses: hashicorp/setup-terraform@v2
 
-  - name: Show versions
-    shell: bash
-    run: |
-      terraform version
-      tflint --version
-      aws --version
+  # - name: Show versions
+  #   shell: bash
+  #   run: |
+  #     terraform version
+  #     tflint --version
+  #     aws --version
 
   # - name: Configure Terraform Plugin Cache
   #   shell: bash
@@ -53,8 +53,8 @@ runs:
   #     path: ${{ inputs.tf_cache_dir }}
   #     key: plugins-${{ matrix.module }}-${{ hashFiles(env.TF_LOCKFILE) }}
 
-  - name: Cache TFlint Plugins
-    uses: actions/cache@v3
-    with:
-      path: ~/.tflint.d/plugins
-      key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
+  # - name: Cache TFlint Plugins
+  #   uses: actions/cache@v3
+  #   with:
+  #     path: ~/.tflint.d/plugins
+  #     key: ubuntu-latest-tflint-${{ hashFiles('.tflint.hcl') }}
