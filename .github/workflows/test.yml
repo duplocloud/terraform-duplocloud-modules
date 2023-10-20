@@ -59,16 +59,16 @@ jobs:
     - uses: actions/checkout@v3
       name: Checkout source code
 
-    # - name: Install Dependencies
-    #   uses: ./.github/actions/dependencies
+    - name: Install Dependencies
+      uses: ./.github/actions/dependencies
 
-    # - name: Login AWS
-    #   uses: ./.github/actions/setup_aws
-    - name: Duplo and AWS Setup
-      uses: duplocloud/actions/setup@main
+    - name: Login AWS
+      uses: ./.github/actions/setup_aws
+    # - name: Duplo and AWS Setup
+    #   uses: duplocloud/actions/setup@main
     
-    - name: Terraform Setup
-      uses: duplocloud/actions/setup-terraform@main
+    # - name: Terraform Setup
+    #   uses: duplocloud/actions/setup-terraform@main
 
     - name: TF Validate Example for Module
       uses: ./.github/actions/tf_validate
