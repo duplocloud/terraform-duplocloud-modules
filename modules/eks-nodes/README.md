@@ -4,7 +4,7 @@ Creates duplocloud EKS hosts for a tenant. This creates an HA setup on at least 
 
 ## Example  
 
-Here is a simple example used often. 
+Here is a simple example used often.
 
 ```hcl
 module "nodegroup" {
