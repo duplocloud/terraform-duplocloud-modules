@@ -71,13 +71,13 @@ jobs:
       uses: duplocloud/actions/setup-terraform@main
 
     - name: TF Validate Example for Module
-      uses: ./.github/actions/tf_validate
+      uses: duplocloud/actions/terraform-module@main
       with:
         wkdir: ./examples/${{ matrix.module }}
         test: false
 
     - name: TF Validate Module
-      uses: ./.github/actions/tf_validate
+      uses: duplocloud/actions/terraform-module@main
       with:
         wkdir: ./modules/${{ matrix.module }}
         plan: false
