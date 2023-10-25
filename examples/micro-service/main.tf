@@ -6,6 +6,11 @@ terraform {
       version = "> 0.9.40"
     }
   }
+  backend "s3" {
+    workspace_key_prefix = "duplocloud/components"
+    key                  = "micro-service"
+    encrypt              = true
+  }
 }
 provider "duplocloud" {}
 

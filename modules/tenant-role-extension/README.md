@@ -1,4 +1,4 @@
-## Example
+## Example 
 ```
 locals {
   my_secrets_prefix = "SecretSauce"
