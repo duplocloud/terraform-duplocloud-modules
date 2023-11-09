@@ -51,3 +51,8 @@ variable "minion_tags" {
   description = "Tags to apply to the Duplo Minions"
   default     = {}
 }
+variable "metadata" {
+  type        = map(string)
+  description = "Metadata to apply to the Duplo Minions"
+  default     = {}
+}

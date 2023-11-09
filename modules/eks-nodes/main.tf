@@ -5,6 +5,12 @@ locals {
       value = v
     }
   ]
+  metadata = [
+    for k, v in var.metadata : {
+      key   = k
+      value = v
+    }
+  ]
 }
 
 # discover the ami
@@ -49,9 +55,17 @@ resource "duplocloud_asg_profile" "nodes" {
   cloud                 = 0
   use_launch_template   = true
   is_cluster_autoscaled = true
+
   metadata {
     key   = "OsDiskSize"
     value = tostring(var.os_disk_size)
+  }
+  dynamic "metadata" {
+    for_each = local.metadata
+    content {
+      key   = metadata.value.key
+      value = metadata.value.value
+    }
   }
   dynamic "minion_tags" {
     for_each = local.minion_tags

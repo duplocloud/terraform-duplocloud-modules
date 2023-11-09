@@ -39,3 +39,4 @@ target/**
 .envrc
 *.log
 *.plan
+*.tfplan
