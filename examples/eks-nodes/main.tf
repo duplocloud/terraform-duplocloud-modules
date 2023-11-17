@@ -39,5 +39,4 @@ module "asg" {
   max_instance_count = 1
   capacity           = "m5.large"
   os_disk_size       = 20
-  eks_version        = "1.24"
 }

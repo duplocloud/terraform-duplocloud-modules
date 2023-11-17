@@ -1,10 +1,12 @@
-# EKS HA Nodes  
+# EKS HA Nodes
 
-Creates duplocloud EKS hosts for a tenant. This creates an HA setup on at least two zones. The min/max/count is actually multiplied by the amount of zones. So if you have 3 zones and you set min=1, max=3, count=2, you will get 6 hosts. 
+Creates duplocloud EKS hosts for a tenant. This is an opinionated module that enforces good practices for DuploCloud environments. If you need to accommodate an edge case, you can implement custom ASGs with the [`duplocloud_asg_profile` resource](https://registry.terraform.io/providers/duplocloud/duplocloud/latest/docs/resources/asg_profile).
 
-## Example  
+The min/max/count is actually multiplied by the amount of zones. So if you have 3 zones and you set min=1, max=3, count=2, you will get 6 hosts.
 
-Here is a simple example used often. 
+## Example
+
+Here is a simple example used often.
 
 ```hcl
 module "nodegroup" {
@@ -20,18 +22,18 @@ module "nodegroup" {
 }
 ```
 
-## Testing  
+## Testing
 
-Run the unit tests with: 
+Run the unit tests with:
 ```sh
 terraform test -filter=tests/unit.tftests.hcl
 ```
 
-Run the integration tests with: 
+Run the integration tests with:
 ```sh
 terraform test -filter=tests/integration.tftests.hcl
 ```
 
-## References  
+## References
   - [Duploclud Hosts](https://docs.duplocloud.com/docs/azure/use-cases/hosts-vms)
   - [Duplocloud ASG](https://docs.duplocloud.com/docs/aws/use-cases/auto-scaling/auto-scaling-groups)

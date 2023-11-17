@@ -2,7 +2,7 @@ variable "tenant_id" {
   type = string
 }
 variable "prefix" {
-  default = "apps-"
+  default = ""
   type    = string
 }
 variable "eks_version" {
@@ -11,9 +11,9 @@ variable "eks_version" {
   default = ""
 }
 variable "az_list" {
-  default     = ["a", "b"]
+  default     = []
   type        = list(string)
-  description = "The letter at the end of the zone"
+  description = "Deprecated. This variable no longer has any effect. One ASG is created for each AZ configured in the DuploCloud 'plan'."
 }
 variable "base_ami_name" {
   description = "Deprecated. This variable no longer has any effect. The EKS AMI is found internally by the duplocloud_native_host_image resource."

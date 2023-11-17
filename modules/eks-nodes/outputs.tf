@@ -1,3 +1,3 @@
 output "node_ami" {
-  value = data.aws_ami.eks.id
+  value = data.duplocloud_native_host_image.this.image_id
 }

@@ -18,10 +18,20 @@ data "duplocloud_native_host_image" "this" {
   is_kubernetes = true
 }
 
+data "duplocloud_infrastructure" "this" {
+  tenant_id = var.tenant_id
+}
+
+data "duplocloud_plan" "this" {
+  # DuploCloud plan names always match the infrastructure they're associated with.
+  plan_id = data.duplocloud_infrastructure.this.infra_name
+}
+
 resource "duplocloud_asg_profile" "nodes" {
-  count         = length(var.az_list)
-  zone          = count.index
-  friendly_name = "${var.prefix}${var.az_list[count.index]}"
+  for_each = toset(data.duplocloud_plan.this.availability_zones)
+
+  zone          = index(data.duplocloud_plan.this.availability_zones, each.key)
+  friendly_name = join("-", compact([var.prefix, each.key]))
   image_id      = data.duplocloud_native_host_image.this.image_id
 
   tenant_id          = var.tenant_id
