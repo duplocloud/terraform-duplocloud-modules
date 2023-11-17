@@ -6,8 +6,9 @@ variable "prefix" {
   type    = string
 }
 variable "eks_version" {
+  description = "Deprecated. This variable no longer has any effect. The EKS version is determined internally by the duplocloud_native_host_image resource."
   type    = string
-  default = "1.24"
+  default = ""
 }
 variable "az_list" {
   default     = ["a", "b"]
@@ -15,8 +16,9 @@ variable "az_list" {
   description = "The letter at the end of the zone"
 }
 variable "base_ami_name" {
-  default = "amazon-eks-node"
-  type    = string
+  description = "Deprecated. This variable no longer has any effect. The EKS AMI is found internally by the duplocloud_native_host_image resource."
+  default     = ""
+  type        = string
 }
 variable "capacity" {
   default = "t3.medium"

@@ -13,32 +13,16 @@ locals {
   ]
 }
 
-# discover the ami
-data "aws_ami" "eks" {
-  most_recent = true
-  owners      = ["602401143452"]
-
-  filter {
-    name   = "name"
-    values = ["${var.base_ami_name}-${var.eks_version}-*"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+data "duplocloud_native_host_image" "this" {
+  tenant_id     = var.tenant_id
+  is_kubernetes = true
 }
 
 resource "duplocloud_asg_profile" "nodes" {
   count         = length(var.az_list)
   zone          = count.index
   friendly_name = "${var.prefix}${var.az_list[count.index]}"
-  image_id      = data.aws_ami.eks.id
+  image_id      = data.duplocloud_native_host_image.this.image_id
 
   tenant_id          = var.tenant_id
   instance_count     = var.instance_count
