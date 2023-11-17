@@ -2,7 +2,7 @@ variable "tenant_id" {
   type = string
 }
 variable "prefix" {
-  default = ""
+  default = "eks"
   type    = string
 }
 variable "eks_version" {
