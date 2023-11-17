@@ -30,7 +30,7 @@ resource "duplocloud_asg_profile" "nodes" {
   max_instance_count = var.max_instance_count
   capacity           = var.capacity
   is_ebs_optimized   = var.is_ebs_optimized
-  encrypt_disk       = var.encrypt_disk
+  encrypt_disk       = true
 
   # these stay the same for autoscaling eks nodes
   agent_platform        = 7

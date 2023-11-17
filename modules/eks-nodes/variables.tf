@@ -45,8 +45,9 @@ variable "is_ebs_optimized" {
   type    = bool
 }
 variable "encrypt_disk" {
-  default = false
-  type    = bool
+  default     = true
+  description = "Deprecated. This variable no longer has any effect. All ASGs are created with encrypted disks."
+  type        = bool
 }
 variable "minion_tags" {
   type        = map(string)
