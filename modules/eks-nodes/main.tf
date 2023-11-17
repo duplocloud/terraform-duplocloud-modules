@@ -70,5 +70,8 @@ resource "duplocloud_asg_profile" "nodes" {
   }
   lifecycle {
     create_before_destroy = true
+    ignore_changes = [
+      instance_count # Don't undo changes made by cluster autoscaler.
+    ]
   }
 }
