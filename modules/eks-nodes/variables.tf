@@ -21,7 +21,8 @@ variable "base_ami_name" {
   type        = string
 }
 variable "capacity" {
-  type = string
+  description = "Instance type."
+  type        = string
 }
 variable "instance_count_per_zone" {
   description = "Desired number of instances in each zone's ASG."
