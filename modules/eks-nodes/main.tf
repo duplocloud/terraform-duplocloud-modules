@@ -35,9 +35,9 @@ resource "duplocloud_asg_profile" "nodes" {
   image_id      = data.duplocloud_native_host_image.this.image_id
 
   tenant_id          = var.tenant_id
-  instance_count     = var.instance_count
-  min_instance_count = var.min_instance_count
-  max_instance_count = var.max_instance_count
+  instance_count     = var.instance_count_per_zone
+  min_instance_count = var.min_instance_count_per_zone
+  max_instance_count = var.max_instance_count_per_zone
   capacity           = var.capacity
   is_ebs_optimized   = var.is_ebs_optimized
   encrypt_disk       = true

@@ -24,17 +24,20 @@ variable "capacity" {
   default = "t3.medium"
   type    = string
 }
-variable "instance_count" {
-  default = 1
-  type    = number
+variable "instance_count_per_zone" {
+  description = "Desired number of instances in each zone's ASG."
+  default     = 1
+  type        = number
 }
-variable "min_instance_count" {
-  default = 1
-  type    = number
+variable "min_instance_count_per_zone" {
+  description = "Minimum number of instances in each zone's ASG."
+  default     = 1
+  type        = number
 }
-variable "max_instance_count" {
-  default = 3
-  type    = number
+variable "max_instance_count_per_zone" {
+  description = "Maximum number of instances in each zone's ASG."
+  default     = 3
+  type        = number
 }
 variable "os_disk_size" {
   default = 20
