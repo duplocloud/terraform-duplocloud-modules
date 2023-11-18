@@ -5,21 +5,6 @@ variable "prefix" {
   default = "eks"
   type    = string
 }
-variable "eks_version" {
-  description = "Deprecated. This variable no longer has any effect. The EKS version is determined internally by the duplocloud_native_host_image resource."
-  type    = string
-  default = ""
-}
-variable "az_list" {
-  default     = []
-  type        = list(string)
-  description = "Deprecated. This variable no longer has any effect. One ASG is created for each AZ configured in the DuploCloud 'plan'."
-}
-variable "base_ami_name" {
-  description = "Deprecated. This variable no longer has any effect. The EKS AMI is found internally by the duplocloud_native_host_image resource."
-  default     = ""
-  type        = string
-}
 variable "capacity" {
   description = "Instance type."
   type        = string
@@ -43,11 +28,6 @@ variable "os_disk_size" {
 variable "is_ebs_optimized" {
   default = false
   type    = bool
-}
-variable "encrypt_disk" {
-  default     = true
-  description = "Deprecated. This variable no longer has any effect. All ASGs are created with encrypted disks."
-  type        = bool
 }
 variable "minion_tags" {
   type        = map(string)

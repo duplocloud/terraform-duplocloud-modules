@@ -14,13 +14,19 @@ module "nodegroup" {
   version            = "0.0.5"
   tenant_id          = local.tenant_id
   capacity           = var.asg_capacity
-  eks_version        = local.eks_version
   instance_count     = var.asg_instance_count
   min_instance_count = var.asg_min_instance_count
   max_instance_count = var.asg_max_instance_count
   os_disk_size       = var.asg_os_disk_size
 }
 ```
+
+## Deprecated Variables
+
+* `az_list`. One ASG is created for each AZ configured in the [DuploCloud plan](https://docs.duplocloud.com/docs/getting-started/application-focussed-interface/plan).
+* `base_ami_name`.  The EKS AMI is found internally by the `duplocloud_native_host_image` resource.
+* `eks_version`. The EKS version is determined internally by the `duplocloud_native_host_image` resource.
+* `encrypt_disk`. All ASGs are created with encrypted disks.
 
 ## Testing
 
