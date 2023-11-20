@@ -33,7 +33,7 @@ module "asg" {
   source = "../../modules/eks-nodes"
   # version                     = "0.0.10"
   tenant_id                   = data.duplocloud_tenant.current.id
-  prefix                      = "fun-"
+  prefix                      = "fun"
   instance_count_per_zone     = 1
   min_instance_count_per_zone = 1
   max_instance_count_per_zone = 1
