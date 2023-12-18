@@ -38,7 +38,7 @@ data "aws_ami" "eks" {
 resource "duplocloud_asg_profile" "nodes" {
   count         = length(var.az_list)
   zone          = count.index
-  friendly_name = "${var.prefix}${var.az_list[count.index]}-${local.identifier}"
+  friendly_name = "${var.prefix}${var.az_list[count.index]}-${local.ami_identifier}"
   image_id      = data.aws_ami.eks.id
 
   tenant_id          = var.tenant_id
