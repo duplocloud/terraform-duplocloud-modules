@@ -1,4 +1,5 @@
 locals {
+  ami_identifier = substr(data.aws_ami.eks.id, -5, 5)
   minion_tags = [
     for k, v in var.minion_tags : {
       key   = k
@@ -11,7 +12,6 @@ locals {
       value = v
     }
   ]
-  ami_identifier = substr(data.aws_ami.eks.id, -5, 5)
 }
 
 # discover the ami
