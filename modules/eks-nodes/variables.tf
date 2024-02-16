@@ -56,3 +56,8 @@ variable "metadata" {
   description = "Metadata to apply to the Duplo Minions"
   default     = {}
 }
+variable "asg_ami" {
+  default = null
+  description = "Set AMI to static value"
+  type    = string
+}
