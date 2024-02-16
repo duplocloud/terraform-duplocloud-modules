@@ -1,6 +1,6 @@
 locals {
   ami_identifier = substr(local.asg_ami, -5, 5)
-  asg_ami = var.asg_ami != null ? var.asg_ami : data.aws_ami.eks.id
+  asg_ami        = var.asg_ami != null ? var.asg_ami : data.aws_ami.eks.id
   minion_tags = [
     for k, v in var.minion_tags : {
       key   = k

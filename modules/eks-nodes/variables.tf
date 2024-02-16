@@ -57,7 +57,7 @@ variable "metadata" {
   default     = {}
 }
 variable "asg_ami" {
-  default = null
+  default     = null
   description = "Set AMI to static value"
-  type    = string
+  type        = string
 }
