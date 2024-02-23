@@ -18,7 +18,7 @@ locals {
 # discover the ami
 data "aws_ami" "eks" {
   most_recent = true
-  owners      = ["602401143452"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
