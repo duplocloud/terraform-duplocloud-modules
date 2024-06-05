@@ -4,8 +4,8 @@ variable "tenant_id" {
 
 variable "name" {
   description = "The name of the instance"
-  type = string
-  default = "retool-bastion"
+  type        = string
+  default     = "retool-bastion"
 }
 
 variable "capacity" {
