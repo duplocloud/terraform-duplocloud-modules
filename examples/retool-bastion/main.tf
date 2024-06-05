@@ -17,8 +17,8 @@ data "duplocloud_tenant" "current" {
 }
 
 module "retool_bastion" {
-  source    = "../../modules/retool-bastion"
-  tenant_id = data.duplocloud_tenant.current.id
+  source            = "../../modules/retool-bastion"
+  tenant_id         = data.duplocloud_tenant.current.id
   retool_public_key = "abc123"
 }
 
