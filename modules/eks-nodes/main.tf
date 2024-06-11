@@ -58,7 +58,7 @@ resource "duplocloud_asg_profile" "nodes" {
   is_minion           = true
   allocated_public_ip = false
   cloud               = 0
-  # use_launch_template   = true
+  # use_launch_template = true
   is_cluster_autoscaled = true
 
   metadata {
