@@ -61,3 +61,16 @@ variable "asg_ami" {
   description = "Set AMI to static value"
   type        = string
 }
+variable "use_spot_instances" {
+  default = false
+  type    = bool
+}
+variable "max_spot_price" {
+  default     = null
+  description = "Maximum price to pay for a spot instance in dollars per unit hour, such as 0.40"
+  type        = string
+}
+variable "can_scale_from_zero" {
+  default = false
+  type    = bool
+}
