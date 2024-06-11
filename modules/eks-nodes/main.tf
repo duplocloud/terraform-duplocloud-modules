@@ -52,7 +52,7 @@ resource "duplocloud_asg_profile" "nodes" {
   use_spot_instances  = var.use_spot_instances
   max_spot_price      = var.max_spot_price
   can_scale_from_zero = var.can_scale_from_zero
-  
+
   # these stay the same for autoscaling eks nodes
   agent_platform      = 7
   is_minion           = true
