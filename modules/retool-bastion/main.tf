@@ -51,3 +51,5 @@ resource "duplocloud_aws_host" "bastion" {
 
 
 
+
+
