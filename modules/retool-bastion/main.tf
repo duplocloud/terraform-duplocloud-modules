@@ -43,7 +43,7 @@ resource "duplocloud_aws_host" "bastion" {
   capacity            = var.capacity
   keypair_type        = 1
   allocated_public_ip = true
-  agent_platform      = 0
+  agent_platform      = 4
   zone                = 0
   base64_user_data    = base64encode(local.user_data)
 }
