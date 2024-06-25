@@ -47,3 +47,6 @@ resource "duplocloud_aws_host" "bastion" {
   zone                = 0
   base64_user_data    = base64encode(local.user_data)
 }
+
+
+
