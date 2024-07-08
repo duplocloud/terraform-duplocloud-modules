@@ -1,5 +1,5 @@
 locals {
-  ami_identifier = substr(local.asg_ami, -5, 5)
+  ami_identifier = random_integer.identifier.result
   asg_ami        = var.asg_ami != null ? var.asg_ami : data.aws_ami.eks.id
   minion_tags = [
     for k, v in var.minion_tags : {
@@ -82,5 +82,20 @@ resource "duplocloud_asg_profile" "nodes" {
   lifecycle {
     create_before_destroy = true
     ignore_changes        = [instance_count]
+  }
+}
+
+resource "random_integer" "identifier" {
+  min = 10000
+  max = 99999
+  keepers = {
+    asg_ami = local.asg_ami
+    capacity            = var.capacity
+    is_ebs_optimized    = var.is_ebs_optimized
+    encrypt_disk        = var.encrypt_disk
+    use_spot_instances  = tostring(var.use_spot_instances)
+    max_spot_price      = tostring(var.max_spot_price)
+    can_scale_from_zero = var.can_scale_from_zero
+    prefix              = var.prefix
   }
 }
