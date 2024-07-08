@@ -89,7 +89,7 @@ resource "random_integer" "identifier" {
   min = 10000
   max = 99999
   keepers = {
-    asg_ami = local.asg_ami
+    asg_ami             = local.asg_ami
     capacity            = var.capacity
     is_ebs_optimized    = var.is_ebs_optimized
     encrypt_disk        = var.encrypt_disk
