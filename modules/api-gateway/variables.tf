@@ -17,6 +17,11 @@ variable "type" {
   }
 }
 
+variable "body" {
+  description = "The body of the api gateway"
+  type        = string
+}
+
 variable "enable_logging" {
   description = "Enable logging for the gateway"
   type        = bool
