@@ -10,6 +10,10 @@ variable "name" {
 variable "package_type" {
   description = "The type of package to deploy"
   type        = string
+  validation {
+    condition     = contains(["image", "s3"], var.package_type)
+    error_message = "Allowed values for input_parameter are image and s3"
+  }
 }
 
 variable "handler" {
@@ -24,4 +28,21 @@ variable "image" {
     entry_point       = optional(string)
     working_directory = optional(string)
   })
+}
+
+variable "description" {
+  type = string
+  default = "Duplocloud Rocks"
+}
+
+variable "timeout"{
+  description = "The timeout for the lambda"
+  default = 600
+  type = number
+}
+
+variable "memory_size" {
+  description = "The memory size for the lambda"
+  default = 2048
+  type = number
 }
