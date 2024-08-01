@@ -25,7 +25,7 @@ variable "handler" {
 variable "image" {
   type = object({
     uri               = string
-    entry_point       = optional(string)
+    entry_point       = optional(list(string))
     working_directory = optional(string)
   })
 }

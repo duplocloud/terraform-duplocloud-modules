@@ -1,6 +1,5 @@
 resource "duplocloud_aws_lambda_function" "this" {
-  count = var.package_type == "Image" ? 1 : 0 
-  tenant_id   = duplocloud_tenant.this.tenant_id
+  tenant_id   = data.duplocloud_tenant.this.tenant_id
   name        = var.name
   description = "${var.description}"
 
