@@ -42,5 +42,5 @@ variable "cert_name" {
 variable "vpc_link_targets" {
   description = "The list of vpc link targets when type is not http, ie rest, private-rest, or socket"
   type        = list(string)
-  nullable    = true
+  default     = []
 }
