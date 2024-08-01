@@ -46,3 +46,13 @@ variable "memory_size" {
   default = 2048
   type = number
 }
+
+variable "tracing_mode" {
+  description = "The tracing mode for the lambda"
+  default = "PassThrough"
+  type = string
+  validation {
+    condition     = contains(["Active", "PassThrough"], var.tracing_mode)
+    error_message = "Allowed values for tracing_mode are Active and PassThrough"
+  }
+}
