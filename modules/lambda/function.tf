@@ -7,7 +7,7 @@ resource "duplocloud_aws_lambda_function" "this" {
   image_uri    = var.image.uri
 
   image_config {
-    command           = var.handler
+    command           = [var.handler]
     entry_point       = var.image.entry_point
     working_directory = var.image.working_directory
   }
