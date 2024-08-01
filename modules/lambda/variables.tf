@@ -11,7 +11,7 @@ variable "package_type" {
   description = "The type of package to deploy"
   type        = string
   validation {
-    condition     = contains(["image", "s3"], var.package_type)
+    condition     = contains(["Image", "Zip"], var.package_type)
     error_message = "Allowed values for input_parameter are image and s3"
   }
 }
