@@ -20,7 +20,8 @@ variable "type" {
 variable "body" {
   description = "The body of the api gateway"
   type        = string
-  nullable = true
+  nullable    = true
+  default     = null
 }
 
 variable "enable_logging" {
