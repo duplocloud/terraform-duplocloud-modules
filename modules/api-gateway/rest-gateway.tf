@@ -1,22 +1,25 @@
 resource "aws_api_gateway_rest_api" "this" {
+  count = var.type == "rest" ? 1 : 0
   name = local.fullname
 
   endpoint_configuration {
     types = ["REGIONAL"]
   }
+  body = var.body
   lifecycle {
     ignore_changes = [
-      tags,
-      body
+      tags
     ]
   }
 }
 
 resource "aws_api_gateway_deployment" "this" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
+  count = var.type == "rest" ? 1 : 0
+
+  rest_api_id = aws_api_gateway_rest_api.this[0].id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.this.body))
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.this[0].body))
   }
 
   lifecycle {
@@ -25,19 +28,22 @@ resource "aws_api_gateway_deployment" "this" {
 }
 
 resource "aws_api_gateway_stage" "default" {
+  count = var.type == "rest" ? 1 : 0
+
   stage_name    = "default"
-  deployment_id = aws_api_gateway_deployment.this.id
-  rest_api_id   = aws_api_gateway_rest_api.this.id
+  deployment_id = aws_api_gateway_deployment.this[0].id
+  rest_api_id   = aws_api_gateway_rest_api.this[0].id
 }
 
 resource "aws_api_gateway_vpc_link" "this" {
-  count = var.enable_private_link ? var.type != "http" ? 1 : 0 : 0
+  count = var.enable_private_link ? var.type != "rest" ? 1 : 0 : 0
   name        = local.fullname
   description = "Private connections for ${var.name} in ${var.tenant_name}"
   target_arns = var.vpc_link_targets
 }
 
 resource "aws_api_gateway_domain_name" "this" {
+  count = var.type == "rest" ? 1 : 0
   domain_name     = local.domain
   certificate_arn = data.duplocloud_plan_certificate.this.arn
 }
@@ -45,13 +51,15 @@ resource "aws_api_gateway_domain_name" "this" {
 # Example DNS record using Route53.
 # Route53 is not specifically required; any DNS host can be used.
 resource "aws_route53_record" "rest_gateway" {
-  name    = aws_api_gateway_domain_name.this.domain_name
+  count = var.type == "rest" ? 1 : 0
+
+  name    = aws_api_gateway_domain_name.this[0].domain_name
   type    = "A"
   zone_id = local.zone_id
 
   alias {
-    name                   = aws_api_gateway_domain_name.this.regional_domain_name
-    zone_id                = aws_api_gateway_domain_name.this.regional_zone_id
+    name                   = aws_api_gateway_domain_name.this[0].regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.this[0].regional_zone_id
     evaluate_target_health = false
   }
 }
