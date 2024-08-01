@@ -1,12 +1,12 @@
 locals {
   tenant_id   = data.duplocloud_tenant.this.id
   shortname   = "${var.tenant_name}-${var.name}"
-  fullname    = "duplo-${shortname}"
+  fullname    = "duplo-${local.shortname}"
   namespace   = "duploservices-${var.tenant_name}"
   sg_infra    = tolist(data.duplocloud_infrastructure.this.security_groups)
-  base_domain = data.duplocloud_plan_settings.this.dns_settings.external_dns_suffix
+  base_domain = data.duplocloud_plan_settings.this.dns_setting.external_dns_suffix
   domain      = "${local.shortname}.${local.base_domain}"
-  zone_id     = data.duplocloud_plan_settings.this.dns_settings.domain_id
+  zone_id     = data.duplocloud_plan_settings.this.dns_setting.domain_id
   base_tags = {
     TENANT_NAME   = var.tenant_name
     duplo-project = var.tenant_name
