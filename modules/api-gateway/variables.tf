@@ -33,7 +33,7 @@ variable "openapi_file" {
 
 variable "openapi_variables" {
   description = "Extra parameters required for the open api template file that are not account id, duplo tenant, the domain, or the aws region"
-  type        = map()
+  type        = map(any)
   default     = {}
 }
 

@@ -56,3 +56,12 @@ variable "tracing_mode" {
     error_message = "Allowed values for tracing_mode are Active and PassThrough"
   }
 }
+
+variable "api_gateway" {
+  type = object({
+    id = string 
+    permission = optional(string, "*/*/*")
+  })
+  nullable = true
+  default = null
+}
