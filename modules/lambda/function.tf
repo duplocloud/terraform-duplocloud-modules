@@ -20,7 +20,7 @@ resource "duplocloud_aws_lambda_function" "this" {
   memory_size = var.memory_size
   
 lifecycle {
-  ignore_changes = [ architecture ]
+  ignore_changes = [ architectures ]
 }
 
 }
