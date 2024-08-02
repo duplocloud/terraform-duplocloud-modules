@@ -7,6 +7,7 @@ locals {
   base_domain = data.duplocloud_plan_settings.this.dns_setting[0].external_dns_suffix
   domain      = "${local.shortname}${local.base_domain}"
   zone_id     = data.duplocloud_plan_settings.this.dns_setting[0].domain_id
+  api_id      = var.type == "http" ? aws_apigatewayv2_api.this[0].id : aws_api_gateway_rest_api.this[0].id
   base_tags = {
     TENANT_NAME   = var.tenant_name
     duplo-project = var.tenant_name
