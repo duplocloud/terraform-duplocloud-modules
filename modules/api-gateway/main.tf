@@ -27,7 +27,7 @@ locals {
         path       = path
         method     = upper(title(method))
         integration = details["x-amazon-apigateway-integration"]
-        name = regex("function:([^:]+)", details["x-amazon-apigateway-integration"].uri)[0]
+        name = regex("function:([^/]+)", details["x-amazon-apigateway-integration"].uri)[0]
       }
     ]
   ])
