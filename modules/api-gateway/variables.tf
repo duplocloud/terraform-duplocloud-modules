@@ -18,10 +18,23 @@ variable "type" {
 }
 
 variable "body" {
-  description = "The body of the api gateway"
+  description = "The body of the api gateway as a string"
   type        = string
   nullable    = true
   default     = null
+}
+
+variable "openapi_file" {
+  description = "Filepath to the open api file. Use interchangeably with providing the string in 'body'"
+  type        = string
+  nullable    = true
+  default     = null
+}
+
+variable "openapi_variables" {
+  description = "Extra parameters required for the open api template file that are not account id, duplo tenant, the domain, or the aws region"
+  type        = map()
+  default     = {}
 }
 
 variable "enable_logging" {

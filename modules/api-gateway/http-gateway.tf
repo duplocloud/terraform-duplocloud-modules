@@ -1,8 +1,9 @@
 resource "aws_apigatewayv2_api" "this" {
-  count = var.type == "http" ? 1 : 0
+  count         = var.type == "http" ? 1 : 0
   name          = local.fullname
   description   = "Gateway for ${var.name} within ${var.tenant_name}"
   protocol_type = "HTTP"
+  body          = local.body
   tags          = local.base_tags
   cors_configuration {
     allow_origins = ["*"]
@@ -12,7 +13,6 @@ resource "aws_apigatewayv2_api" "this" {
   }
   lifecycle {
     ignore_changes = [
-      body,
       tags,
       tags_all,
       version
@@ -21,7 +21,7 @@ resource "aws_apigatewayv2_api" "this" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "this" {
-  count = var.type == "http" ? 1 : 0
+  count       = var.type == "http" ? 1 : 0
   api_id      = aws_apigatewayv2_api.this[0].id
   domain_name = aws_apigatewayv2_domain_name.this[0].id
   stage       = aws_apigatewayv2_stage.default[0].id
@@ -29,12 +29,12 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 
 resource "aws_cloudwatch_log_group" "api_gateway" {
   count = var.type == "http" ? 1 : 0
-  name = "/${var.tenant_name}/gateway/${var.name}"
-  tags = local.base_tags
+  name  = "/${var.tenant_name}/gateway/${var.name}"
+  tags  = local.base_tags
 }
 
 resource "aws_apigatewayv2_stage" "default" {
-  count = var.type == "http" ? 1 : 0
+  count       = var.type == "http" ? 1 : 0
   api_id      = aws_apigatewayv2_api.this[0].id
   name        = "default"
   auto_deploy = true
@@ -58,7 +58,7 @@ resource "aws_apigatewayv2_stage" "default" {
 }
 
 resource "aws_apigatewayv2_vpc_link" "this" {
-  count = var.enable_private_link ? var.type == "http" ? 1 : 0  : 0
+  count = var.enable_private_link ? var.type == "http" ? 1 : 0 : 0
   name  = local.fullname
   security_group_ids = [
     local.sg_infra[index(local.sg_infra.*.name, "duplo-allhosts")].id,
@@ -69,7 +69,7 @@ resource "aws_apigatewayv2_vpc_link" "this" {
 }
 
 resource "aws_apigatewayv2_domain_name" "this" {
-  count = var.type == "http" ? 1 : 0
+  count       = var.type == "http" ? 1 : 0
   domain_name = local.domain
   domain_name_configuration {
     certificate_arn = data.duplocloud_plan_certificate.this.arn
@@ -80,7 +80,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
 }
 
 resource "aws_route53_record" "http_gateway" {
-  count = var.type == "http" ? 1 : 0
+  count   = var.type == "http" ? 1 : 0
   name    = aws_apigatewayv2_domain_name.this[0].domain_name
   type    = "A"
   zone_id = local.zone_id

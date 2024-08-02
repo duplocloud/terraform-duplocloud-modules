@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "this" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-  body = var.body
+  body = local.body
   lifecycle {
     ignore_changes = [
       tags

@@ -11,7 +11,16 @@ locals {
     TENANT_NAME   = var.tenant_name
     duplo-project = var.tenant_name
   }
+  body_vars = merge(var.openapi_variables, {
+    AWS_ACCOUNT_ID = data.duplocloud_aws_account.this.account_id
+    AWS_REGION     = data.duplocloud_infrastructure.this.region
+    DUPLO_TENANT   = var.tenant_name
+    DOMAIN         = local.domain
+  })
+  body = var.body != null ? var.body : var.openapi_file == null ? null : yamlencode(yamldecode(templatefile(var.openapi_file, local.body_vars)))
 }
+
+data "duplocloud_aws_account" "this" {}
 
 data "duplocloud_tenant" "this" {
   name = var.tenant_name
