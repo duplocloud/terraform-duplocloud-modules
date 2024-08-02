@@ -1,4 +1,6 @@
 locals {
+  account_id  = data.duplocloud_aws_account.this.account_id
+  region      = data.duplocloud_infrastructure.this.region
   tenant_id   = data.duplocloud_tenant.this.id
   shortname   = "${var.tenant_name}-${var.name}"
   fullname    = "duplo-${local.shortname}"
@@ -13,8 +15,8 @@ locals {
     duplo-project = var.tenant_name
   }
   body_vars = merge(var.openapi_variables, {
-    AWS_ACCOUNT_ID = data.duplocloud_aws_account.this.account_id
-    AWS_REGION     = data.duplocloud_infrastructure.this.region
+    AWS_ACCOUNT_ID = local.account_id
+    AWS_REGION     = local.region
     DUPLO_TENANT   = var.tenant_name
     DOMAIN         = local.domain
   })
