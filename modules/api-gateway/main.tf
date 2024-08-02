@@ -18,7 +18,17 @@ locals {
     DUPLO_TENANT   = var.tenant_name
     DOMAIN         = local.domain
   })
-  body = var.body != null ? var.body : var.openapi_file == null ? null : yamlencode(yamldecode(templatefile(var.openapi_file, local.body_vars)))
+  body = var.body != null ? yamldecode(var.body) : var.openapi_file == null ? null : yamldecode(templatefile(var.openapi_file, local.body_vars))
+  integrations = flatten([
+    for path, methods in local.body.paths : [
+      for method, details in methods : {
+        path       = path
+        method     = upper(title(method))
+        integration = details["x-amazon-apigateway-integration"]
+        name = regex("function:([^:]+)", details["x-amazon-apigateway-integration"].uri)[0]
+      }
+    ]
+  ])
 }
 
 data "duplocloud_aws_account" "this" {}

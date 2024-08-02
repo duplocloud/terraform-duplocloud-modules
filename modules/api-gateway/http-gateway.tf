@@ -3,7 +3,7 @@ resource "aws_apigatewayv2_api" "this" {
   name          = local.fullname
   description   = "Gateway for ${var.name} within ${var.tenant_name}"
   protocol_type = "HTTP"
-  body          = local.body
+  body          = yamlencode(local.body)
   tags          = local.base_tags
   cors_configuration {
     allow_origins = ["*"]
