@@ -56,3 +56,9 @@ variable "tracing_mode" {
     error_message = "Allowed values for tracing_mode are Active and PassThrough"
   }
 }
+
+variable "environment"{
+  description = "The environment variables for the lambda"
+  type = map(string)
+  default = {}
+}
