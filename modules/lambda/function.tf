@@ -18,7 +18,7 @@ resource "duplocloud_aws_lambda_function" "this" {
 
   timeout     = var.timeout
   memory_size = var.memory_size
-  environment = environment
+  environment { variables = var.environment} 
 lifecycle {
   ignore_changes = [ architectures ]
 }

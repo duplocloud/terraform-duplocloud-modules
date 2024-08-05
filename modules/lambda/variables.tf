@@ -57,7 +57,7 @@ variable "tracing_mode" {
   }
 }
 
-variable "environment"{
+variable "environment" {
   description = "The environment variables for the lambda"
   type = map(string)
   default = {}
