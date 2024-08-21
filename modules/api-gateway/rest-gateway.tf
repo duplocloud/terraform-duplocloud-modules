@@ -51,6 +51,12 @@ resource "aws_api_gateway_domain_name" "this" {
   }
 }
 
+resource "aws_api_gateway_base_path_mapping" "this" {
+  api_id      = aws_api_gateway_rest_api.this.id
+  stage_name  = aws_api_gateway_stage.default.stage_name
+  domain_name = aws_api_gateway_domain_name.this.domain_name
+}
+
 # Example DNS record using Route53.
 # Route53 is not specifically required; any DNS host can be used.
 resource "aws_route53_record" "rest_gateway" {

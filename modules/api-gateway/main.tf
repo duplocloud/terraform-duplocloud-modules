@@ -6,8 +6,9 @@ locals {
   fullname    = "duplo-${local.shortname}"
   namespace   = "duploservices-${var.tenant_name}"
   sg_infra    = tolist(data.duplocloud_infrastructure.this.security_groups)
+  sub_domain  = coalesce(var.subdomain, local.shortname)
   base_domain = data.duplocloud_plan_settings.this.dns_setting[0].external_dns_suffix
-  domain      = "${local.shortname}${local.base_domain}"
+  domain      = "${local.sub_domain}${local.base_domain}"
   zone_id     = data.duplocloud_plan_settings.this.dns_setting[0].domain_id
   api_id      = var.type == "http" ? aws_apigatewayv2_api.this[0].id : aws_api_gateway_rest_api.this[0].id
   base_tags = {

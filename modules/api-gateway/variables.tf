@@ -59,3 +59,10 @@ variable "vpc_link_targets" {
   type        = list(string)
   default     = []
 }
+
+variable "subdomain" {
+  description = "The subdomain as the prefix on the base domain"
+  type = string
+  nullable = true
+  default = null
+}
