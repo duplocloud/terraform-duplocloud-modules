@@ -1,10 +1,5 @@
 terraform {
   required_version = ">= 1.4.4"
-  backend "s3" {
-    workspace_key_prefix = "rodent-royale"
-    key                  = "gamelift-build"
-    encrypt              = true
-  }
   required_providers {
     duplocloud = {
       source  = "duplocloud/duplocloud"
