@@ -32,7 +32,7 @@ variable "fleet" {
       from_port = number
       to_port   = number
       protocol  = string
-      cidr      = string
+      ip_range  = string
     })))
     locations = optional(list(object({
       location = string
