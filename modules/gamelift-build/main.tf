@@ -6,7 +6,7 @@ locals {
   bucket_tenant          = var.build.bucket_tenant_name
   bucket_tenant_prefix   = "duploservices-${local.bucket_tenant}"
   bucket_tenant_role_arn = "arn:aws:iam::${local.account_id}:role/${local.bucket_tenant_prefix}"
-  bucket_key             = coalesce(var.build.key, "${var.name}/${local.build_name}.zip")
+  bucket_key             = coalesce(var.build.bucket_key, "${var.name}/${local.build_name}.zip")
   bucket_name            = "${local.bucket_tenant_prefix}-${var.build.bucket}-${local.account_id}"
 }
 

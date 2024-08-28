@@ -15,7 +15,7 @@ variable "build" {
     bucket             = string
     operating_system   = optional(string, "AMAZON_LINUX_2")
     bucket_tenant_name = optional(string, "devops")
-    key                = optional(string)
+    bucket_key         = optional(string)
   })
 }
 
