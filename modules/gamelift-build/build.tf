@@ -4,7 +4,7 @@ resource "awscc_gamelift_build" "this" {
   operating_system = var.build.operating_system
 
   storage_location = {
-    bucket   = var.build.bucket
+    bucket   = local.bucket_name
     key      = var.build.bucket_key
     role_arn = local.bucket_tenant_role_arn
   }
