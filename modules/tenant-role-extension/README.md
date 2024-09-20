@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "example" {
 
 module "tenant-role" {
   source          = "duplocloud/components/duplocloud//modules/tenant-role-extension"
-  version         = "0.0.8"
+  version         = "0.0.19"
   tenant_name     = local.tenant_name
   iam_policy_json = data.aws_iam_policy_document.example.json
 }
