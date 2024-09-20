@@ -21,7 +21,10 @@ locals {
     DUPLO_TENANT   = var.tenant_name
     DOMAIN         = local.domain
   })
-  body = var.body != null ? yamldecode(var.body) : var.openapi_file == null ? null : yamldecode(templatefile(var.openapi_file, local.body_vars))
+  body_text = (var.body != null ? var.body : 
+    var.openapi_file == null ? file("${path.module}/openapi.yaml") : 
+      templatefile(var.openapi_file, local.body_vars))
+  body = yamldecode(local.body_text)
   integrations = flatten([
     for path, methods in local.body.paths : [
       for method, details in methods : {

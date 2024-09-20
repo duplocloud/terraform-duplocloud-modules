@@ -44,6 +44,7 @@ resource "aws_api_gateway_vpc_link" "this" {
 
 resource "aws_api_gateway_domain_name" "this" {
   count                    = var.type == "rest" ? 1 : 0
+  # tflint-ignore: aws_api_gateway_domain_name_invalid_security_policy
   domain_name              = local.domain
   regional_certificate_arn = data.duplocloud_plan_certificate.this.arn
   endpoint_configuration {
