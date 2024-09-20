@@ -7,7 +7,11 @@ terraform {
     }
     duplocloud = {
       source  = "duplocloud/duplocloud"
-      version = ">= 0.10.2"
+      version = ">= 0.10.24"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.5.0"
     }
   }
 }
