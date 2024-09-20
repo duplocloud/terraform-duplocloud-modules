@@ -40,3 +40,6 @@ target/**
 *.log
 *.plan
 *.tfplan
+
+# mac files
+.DS_Store
