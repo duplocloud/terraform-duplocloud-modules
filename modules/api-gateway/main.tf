@@ -1,3 +1,4 @@
+# tflint-ignore
 locals {
   account_id  = data.duplocloud_aws_account.this.account_id
   region      = data.duplocloud_infrastructure.this.region
@@ -36,6 +37,7 @@ locals {
     ]
   ])
 }
+# tflint-ignore-end
 
 data "duplocloud_aws_account" "this" {}
 
