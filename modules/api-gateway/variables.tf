@@ -37,11 +37,11 @@ variable "openapi_variables" {
   default     = {}
 }
 
-variable "enable_logging" {
-  description = "Enable logging for the gateway"
-  type        = bool
-  default     = true
-}
+# variable "enable_logging" {
+#   description = "Enable logging for the gateway"
+#   type        = bool
+#   default     = true
+# }
 
 variable "enable_private_link" {
   description = "Enable private link for the gateway"

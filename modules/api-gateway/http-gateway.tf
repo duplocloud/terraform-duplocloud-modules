@@ -61,7 +61,7 @@ resource "aws_apigatewayv2_vpc_link" "this" {
   count = var.enable_private_link ? var.type == "http" ? 1 : 0 : 0
   name  = local.fullname
   security_group_ids = [
-    local.sg_infra[index(local.sg_infra.*.name, "duplo-allhosts")].id,
+    local.sg_infra[index(local.sg_infra[*].name, "duplo-allhosts")].id,
     data.aws_security_group.tenant.id
   ]
   subnet_ids = data.duplocloud_tenant_internal_subnets.this.subnet_ids
