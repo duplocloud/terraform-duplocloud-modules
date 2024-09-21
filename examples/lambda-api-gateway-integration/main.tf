@@ -22,7 +22,7 @@ provider "aws" {
 
 
 data "duplocloud_tenant" "current" {
-  name = "dev"
+  name = "tf-tests"
 }
 
 module "lambda_agw_integration" {
