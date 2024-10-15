@@ -74,3 +74,13 @@ variable "can_scale_from_zero" {
   default = false
   type    = bool
 }
+variable "pod_rollover" {
+  default = false
+  description = "Enable/Disable kubectl drain option."
+  type    = bool
+}
+variable "rollover_timeout" {
+  default     = 120
+  description = "Time for the kubectl drain to run before timing out."
+  type        = number
+}
