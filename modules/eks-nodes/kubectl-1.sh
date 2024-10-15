@@ -15,6 +15,7 @@ else
 fi
 
 NODE_LIST=$(duploctl hosts list -q "[?FriendlyName=='$NODENAME'].PrivateIpAddress" --tenant $DUPLO_TENANT)
-NODE_LIST=(${NODE_LIST[@]//[\[\]\",]/})
+NODE_LIST=$(echo $NODE_LIST | tr -d '[]",' | tr ' ' '\n')
 echo $NODE_LIST >> $FILE
+echo $NODE_LIST
 echo "Echoed to $FILE"
