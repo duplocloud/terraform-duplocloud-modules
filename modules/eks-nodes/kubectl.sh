@@ -19,9 +19,9 @@ if [ -e "$FILE" ]; then
         for node_ip in "${NODE_ARRAY[@]}"; do
             for sanity_ip in "${SANITY_ARRAY[@]}"; do
                 if [[ "$node_ip" == "$sanity_ip" ]]; then
-                NODE_FMT="ip-${node_ip//./-}.$REGION.compute.internal"
-                echo "kubectl draining node: $NODE_FMT"
-                kubectl drain $NODE_FMT --ignore-daemonsets --delete-emptydir-data --timeout="${TIMEOUT}s"
+                    NODE_FMT="ip-${node_ip//./-}.$REGION.compute.internal"
+                    echo "kubectl draining node: $NODE_FMT"
+                    kubectl drain $NODE_FMT --ignore-daemonsets --delete-emptydir-data --timeout="${TIMEOUT}s"
                 fi
             done
         done
