@@ -1,6 +1,7 @@
 locals {
   ami_identifier = random_integer.identifier.result
   asg_ami        = var.asg_ami != null ? var.asg_ami : data.aws_ami.eks.id
+  zones          = ["a", "b", "c", "d", "e", "f", "g", "h"]
   minion_tags = [
     for k, v in var.minion_tags : {
       key   = k
@@ -38,7 +39,7 @@ data "aws_ami" "eks" {
 
 resource "duplocloud_asg_profile" "nodes" {
   count         = length(var.az_list)
-  zone          = count.index
+  zone          = index(local.zones, var.az_list[count.index])
   friendly_name = "${var.prefix}${var.az_list[count.index]}-${local.ami_identifier}"
   image_id      = local.asg_ami
 
