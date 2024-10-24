@@ -3,7 +3,7 @@ variable "tenant_name" {
 }
 variable "parameters" {
   type = list(object({
-    name  = string
+    key  = string
     type  = optional(string, "SecureString")
     value = string
   }))
