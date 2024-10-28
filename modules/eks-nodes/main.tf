@@ -98,6 +98,7 @@ resource "random_integer" "identifier" {
     max_spot_price      = tostring(var.max_spot_price)
     can_scale_from_zero = var.can_scale_from_zero
     prefix              = var.prefix
+    az_list             = jsonencode(var.az_list)
   }
 }
 
