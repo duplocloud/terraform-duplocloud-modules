@@ -26,7 +26,7 @@ provider "duplocloud" {
 }
 
 data "duplocloud_tenant" "current" {
-  name = "tf-tests"
+  name = "toolstest"
 }
 
 module "asg" {
@@ -39,5 +39,5 @@ module "asg" {
   max_instance_count = 1
   capacity           = "m5.large"
   os_disk_size       = 20
-  eks_version        = "1.24"
+  eks_version        = "1.28"
 }
