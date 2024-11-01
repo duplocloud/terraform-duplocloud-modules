@@ -98,5 +98,31 @@ resource "random_integer" "identifier" {
     max_spot_price      = tostring(var.max_spot_price)
     can_scale_from_zero = var.can_scale_from_zero
     prefix              = var.prefix
+    az_list             = jsonencode(var.az_list)
+  }
+}
+
+resource "null_resource" "destroy_script" {
+  count = var.pod_rollover ? length(var.az_list) : 0
+  triggers = {
+    fullname = duplocloud_asg_profile.nodes[count.index].fullname
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "${path.module}/kubectl-1.sh ${self.triggers.fullname} ${terraform.workspace} ${count.index}"
+  }
+}
+
+resource "null_resource" "create_script" {
+  count = var.pod_rollover ? length(var.az_list) : 0
+  triggers = {
+    fullname = duplocloud_asg_profile.nodes[count.index].fullname
+  }
+
+  provisioner "local-exec" {
+    when       = create
+    command    = "${path.module}/kubectl.sh ${count.index} ${terraform.workspace} ${var.rollover_timeout}"
+    on_failure = continue
   }
 }
