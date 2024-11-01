@@ -15,7 +15,7 @@ if [ -e "$FILE" ]; then
         echo "File is empty"
     else
         echo "Sleeping 60 seconds, waiting for nodes to come up."
-        sleep 60s
+        sleep 60
         for node_ip in "${NODE_ARRAY[@]}"; do
             for sanity_ip in "${SANITY_ARRAY[@]}"; do
                 if [[ "$node_ip" == "$sanity_ip" ]]; then

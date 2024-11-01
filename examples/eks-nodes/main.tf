@@ -40,4 +40,5 @@ module "asg" {
   capacity           = "m5.large"
   os_disk_size       = 20
   eks_version        = "1.28"
+  pod_rollover       = true
 }
