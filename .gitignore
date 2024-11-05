@@ -40,3 +40,4 @@ target/**
 *.log
 *.plan
 *.tfplan
+temp-*
