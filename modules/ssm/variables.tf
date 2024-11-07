@@ -7,4 +7,5 @@ variable "parameters" {
     type  = optional(string, "SecureString")
     value = string
   }))
+  default = []
 }
