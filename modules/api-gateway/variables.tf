@@ -62,7 +62,7 @@ variable "vpc_link_targets" {
 
 variable "subdomain" {
   description = "The subdomain as the prefix on the base domain"
-  type = string
-  nullable = true
-  default = null
+  type        = string
+  nullable    = true
+  default     = null
 }

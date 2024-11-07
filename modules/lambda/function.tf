@@ -1,7 +1,7 @@
 resource "duplocloud_aws_lambda_function" "this" {
   tenant_id   = data.duplocloud_tenant.this.id
   name        = var.name
-  description = "${var.description}"
+  description = var.description
 
   package_type = var.package_type
   image_uri    = var.image.uri
@@ -18,9 +18,9 @@ resource "duplocloud_aws_lambda_function" "this" {
 
   timeout     = var.timeout
   memory_size = var.memory_size
-  environment { variables = var.environment} 
-lifecycle {
-  ignore_changes = [ architectures ]
-}
+  environment { variables = var.environment }
+  lifecycle {
+    ignore_changes = [architectures]
+  }
 
 }

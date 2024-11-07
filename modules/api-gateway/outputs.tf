@@ -4,5 +4,5 @@ output "domain" {
 
 output "api_id" {
   description = "The ID of the API Gateway"
-  value = local.api_id
+  value       = local.api_id
 }

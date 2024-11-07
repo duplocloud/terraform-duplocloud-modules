@@ -31,26 +31,26 @@ variable "image" {
 }
 
 variable "description" {
-  type = string
+  type    = string
   default = "Duplocloud Rocks"
 }
 
-variable "timeout"{
+variable "timeout" {
   description = "The timeout for the lambda"
-  default = 600
-  type = number
+  default     = 600
+  type        = number
 }
 
 variable "memory_size" {
   description = "The memory size for the lambda"
-  default = 2048
-  type = number
+  default     = 2048
+  type        = number
 }
 
 variable "tracing_mode" {
   description = "The tracing mode for the lambda"
-  default = "PassThrough"
-  type = string
+  default     = "PassThrough"
+  type        = string
   validation {
     condition     = contains(["Active", "PassThrough"], var.tracing_mode)
     error_message = "Allowed values for tracing_mode are Active and PassThrough"
@@ -59,6 +59,6 @@ variable "tracing_mode" {
 
 variable "environment" {
   description = "The environment variables for the lambda"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

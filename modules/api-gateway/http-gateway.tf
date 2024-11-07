@@ -69,7 +69,7 @@ resource "aws_apigatewayv2_vpc_link" "this" {
 }
 
 resource "aws_apigatewayv2_domain_name" "this" {
-  count       = var.type == "http" ? 1 : 0
+  count = var.type == "http" ? 1 : 0
   # tflint-ignore: aws_api_gateway_domain_name_invalid_security_policy
   domain_name = local.domain
   domain_name_configuration {
