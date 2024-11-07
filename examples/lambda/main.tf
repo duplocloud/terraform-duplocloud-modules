@@ -46,12 +46,12 @@ data "duplocloud_tenant_aws_region" "this" {
 }
 
 module "lambda" {
-  source      = "../../modules/lambda"
-  tenant_name = var.tenant_name
-  name = "foo20"
+  source       = "../../modules/lambda"
+  tenant_name  = var.tenant_name
+  name         = "foo20"
   package_type = "Image"
-  handler = "index.handler"
-  description = "My cool lambda"
+  handler      = "index.handler"
+  description  = "My cool lambda"
   image = {
     uri = "123456789012.dkr.ecr.us-west-2.amazonaws.com/lambda-image:latest"
   }

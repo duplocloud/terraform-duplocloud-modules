@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.4.4"
   required_providers {
     awscc = {
-      source = "hashicorp/awscc"
+      source  = "hashicorp/awscc"
       version = "1.10.0"
     }
     duplocloud = {
