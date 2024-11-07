@@ -1,5 +1,5 @@
 resource "duplocloud_aws_lambda_function" "this" {
-  tenant_id   = data.duplocloud_tenant.this.id
+  tenant_id   = local.tenant_id
   name        = var.name
   description = var.description
 
