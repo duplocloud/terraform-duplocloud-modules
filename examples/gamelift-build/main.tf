@@ -1,18 +1,18 @@
 terraform {
   required_version = ">= 1.4.4"
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.19.0"
+    awscc = {
+      source = "hashicorp/awscc"
+      version = "1.10.0"
     }
     duplocloud = {
       source  = "duplocloud/duplocloud"
-      version = ">= 0.9.40"
+      version = ">= 0.10.0"
     }
   }
   backend "s3" {
     workspace_key_prefix = "duplocloud/components"
-    key                  = "ssm"
+    key                  = "gamelift-build"
     encrypt              = true
   }
 }
@@ -23,7 +23,7 @@ variable "tenant_name" {
   default     = "tf-tests"
 }
 
-provider "aws" {
+provider "awscc" {
   region     = data.duplocloud_tenant_aws_region.this.aws_region
   access_key = data.duplocloud_admin_aws_credentials.this.access_key_id
   secret_key = data.duplocloud_admin_aws_credentials.this.secret_access_key
