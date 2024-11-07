@@ -1,6 +1,7 @@
 locals {
   ami_identifier = random_integer.identifier.result
   asg_ami        = var.asg_ami != null ? var.asg_ami : data.aws_ami.eks.id
+  zones          = ["a", "b", "c", "d", "e", "f", "g", "h"]
   minion_tags = [
     for k, v in var.minion_tags : {
       key   = k
@@ -38,7 +39,7 @@ data "aws_ami" "eks" {
 
 resource "duplocloud_asg_profile" "nodes" {
   count         = length(var.az_list)
-  zone          = count.index
+  zone          = index(local.zones, var.az_list[count.index])
   friendly_name = "${var.prefix}${var.az_list[count.index]}-${local.ami_identifier}"
   image_id      = local.asg_ami
 
@@ -97,5 +98,31 @@ resource "random_integer" "identifier" {
     max_spot_price      = tostring(var.max_spot_price)
     can_scale_from_zero = var.can_scale_from_zero
     prefix              = var.prefix
+    az_list             = jsonencode(var.az_list)
+  }
+}
+
+resource "null_resource" "destroy_script" {
+  count = var.pod_rollover ? length(var.az_list) : 0
+  triggers = {
+    fullname = duplocloud_asg_profile.nodes[count.index].fullname
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "${path.module}/kubectl-1.sh ${self.triggers.fullname} ${terraform.workspace} ${count.index}"
+  }
+}
+
+resource "null_resource" "create_script" {
+  count = var.pod_rollover ? length(var.az_list) : 0
+  triggers = {
+    fullname = duplocloud_asg_profile.nodes[count.index].fullname
+  }
+
+  provisioner "local-exec" {
+    when       = create
+    command    = "${path.module}/kubectl.sh ${count.index} ${terraform.workspace} ${var.rollover_timeout}"
+    on_failure = continue
   }
 }

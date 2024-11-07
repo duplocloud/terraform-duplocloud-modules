@@ -2,7 +2,7 @@
 run "validate_name" {
   command = plan
   variables {
-    tenant_id = "0a09ca25-7f0d-4f5f-b9fa-62290273d192"
+    tenant_id = "644636a2-d604-4b77-aaae-8c07acce7c96"
   }
   assert {
     condition     = duplocloud_asg_profile.nodes[0].friendly_name == "apps-a-${local.ami_identifier}"
