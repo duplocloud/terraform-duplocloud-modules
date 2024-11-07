@@ -17,6 +17,12 @@ terraform {
   }
 }
 
+variable "tenant_name" {
+  description = "The name of the tenant"
+  type        = string
+  default     = "tf-tests"
+}
+
 provider "aws" {
   region = "us-west-2"
 }
@@ -25,14 +31,14 @@ provider "duplocloud" {
 
 }
 
-data "duplocloud_tenant" "current" {
-  name = "toolstest"
+data "duplocloud_tenant" "this" {
+  name = var.tenant_name
 }
 
 module "asg" {
   source = "../../modules/eks-nodes"
   # version            = "0.0.10"
-  tenant_id          = data.duplocloud_tenant.current.id
+  tenant_id          = data.duplocloud_tenant.this.id
   prefix             = "fun-"
   instance_count     = 1
   min_instance_count = 1

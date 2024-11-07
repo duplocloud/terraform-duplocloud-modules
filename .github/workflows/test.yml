@@ -10,3 +10,6 @@ jobs:
     name: Test
     uses: duplocloud/actions/.github/workflows/test-tf-modules.yml@main
     secrets: inherit
+    with:
+      environment: salesdemo
+      tenant: tf-tests
