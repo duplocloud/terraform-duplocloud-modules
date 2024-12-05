@@ -11,9 +11,13 @@ else
    node_dns="$REGION.compute.internal"
 fi
 
-FILE="temp-$COUNT"
-if [ -e "$FILE" ]; then
-    NODE_LIST="$(cat $FILE)"
+FILE_PATH="./.terraform"
+ID="$(cat $FILE_PATH/$COUNT-ID)"
+FILE="temp-$COUNT-$ID"
+FULL_PATH="$FILE_PATH/$FILE"
+
+if [ -e "$FULL_PATH" ]; then
+    NODE_LIST="$(cat $FULL_PATH)"
     SANITY_LIST=$(duploctl hosts list --tenant $DUPLO_TENANT -q [].PrivateIpAddress)
     NODE_ARRAY=($(echo $NODE_LIST | tr -d '[],"'))
     SANITY_ARRAY=($(echo $SANITY_LIST | tr -d '[],"'))
@@ -34,7 +38,12 @@ if [ -e "$FILE" ]; then
     fi
 fi
 
-if [ -e "$FILE" ]; then
-    rm "$FILE"
-    echo "File '$FILE' deleted."
+if [ -e "$FULL_PATH" ]; then
+    rm "$FULL_PATH"
+    echo "File '$FULL_PATH' deleted."
+fi
+
+if [ -e "$FILE_PATH/$COUNT-ID" ]; then
+    rm "$FILE_PATH/$COUNT-ID"
+    echo "File '$FILE_PATH/$COUNT-ID' deleted."
 fi
