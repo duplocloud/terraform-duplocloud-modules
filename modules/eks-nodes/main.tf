@@ -106,11 +106,12 @@ resource "null_resource" "destroy_script" {
   count = var.pod_rollover ? length(var.az_list) : 0
   triggers = {
     fullname = duplocloud_asg_profile.nodes[count.index].fullname
+    identifier = random_integer.identifier.result
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "${path.module}/kubectl-1.sh ${self.triggers.fullname} ${terraform.workspace} ${count.index}"
+    command = "${path.module}/kubectl-1.sh ${self.triggers.fullname} ${terraform.workspace} ${count.index} ${self.triggers.identifier}"
   }
 }
 
