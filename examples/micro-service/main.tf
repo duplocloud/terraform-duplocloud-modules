@@ -14,20 +14,20 @@ terraform {
 }
 provider "duplocloud" {}
 
-data "duplocloud_tenant" "current" {
-  name = "tf-tests"
+variable "tenant" {
+  type    = string
+  default = "tf-tests"
 }
 
 module "some_service" {
-  source    = "../../modules/micro-service"
-  tenant_id = data.duplocloud_tenant.current.id
-  name      = "some-service"
-  image     = "nginx:latest"
-  lb_config = {
-    health_check_url = "/"
-    listener_arn     = "somearn"
-    path_pattern     = "/*"
-    port             = 80
-    priority         = 1
+  source = "../../modules/micro-service"
+  tenant = var.tenant
+  name   = "some-service"
+  image = {
+    uri = "nginx:latest"
+  }
+  port = 80
+  lb = {
+    enabled = true
   }
 }

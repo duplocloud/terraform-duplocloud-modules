@@ -1,0 +1,29 @@
+{
+  "EnvFrom": ${env_from},
+  "Resources": {},
+  "RestartPolicy": "Always",
+  "ImagePullPolicy": "${image.pullPolicy}",
+  "PodSecurityContext" : {},
+  %{if health_check.enabled }
+  "LivenessProbe": {
+    "failureThreshold": ${health_check.failureThreshold},
+    "initialDelaySeconds": ${health_check.initialDelaySeconds},
+    "periodSeconds": ${health_check.periodSeconds},
+    "successThreshold": ${health_check.successThreshold},
+    "timeoutSeconds": ${health_check.timeoutSeconds},
+    "tcpSocket": {
+      "port" : ${port}
+    }
+  },
+  "ReadinessProbe": {
+    "failureThreshold": ${health_check.failureThreshold},
+    "initialDelaySeconds": ${health_check.initialDelaySeconds},
+    "periodSeconds": ${health_check.periodSeconds},
+    "successThreshold": ${health_check.successThreshold},
+    "timeoutSeconds" : ${health_check.timeoutSeconds},
+    "tcpSocket": {
+      "port": ${port}
+    }
+  }
+  %{ endif }
+}
