@@ -5,6 +5,8 @@ locals {
     image        = var.image
     port         = var.port
     health_check = var.health_check
+    nodeSelector = jsonencode(var.nodes.selector)
+    restart_policy = var.restart_policy
   }))
 }
 
@@ -12,6 +14,8 @@ resource "duplocloud_duplo_service" "this" {
   tenant_id                            = local.tenant.id
   name                                 = var.name
   replicas                             = var.replicas
+  allocation_tags                      = var.nodes.allocation_tags
+  any_host_allowed                     = var.nodes.shared
   lb_synced_deployment                 = false
   cloud_creds_from_k8s_service_account = true
   is_daemonset                         = false

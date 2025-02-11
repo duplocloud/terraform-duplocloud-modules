@@ -1,9 +1,10 @@
 {
   "EnvFrom": ${env_from},
   "Resources": {},
-  "RestartPolicy": "Always",
+  "RestartPolicy": "${restart_policy}",
   "ImagePullPolicy": "${image.pullPolicy}",
   "PodSecurityContext" : {},
+  "NodeSelector": ${nodeSelector},
   %{if health_check.enabled }
   "LivenessProbe": {
     "failureThreshold": ${health_check.failureThreshold},

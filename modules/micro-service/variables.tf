@@ -29,10 +29,31 @@ variable "replicas" {
   default = 1
 }
 
+variable "restart_policy" {
+  type    = string
+  default = "Always"
+  validation {
+    condition     = can(regex("^(Always|OnFailure|Never)$", var.restart_policy))
+    error_message = "The restart policy must be one of 'Always', 'OnFailure', or 'Never'"
+  }
+}
+
 variable "port" {
   description = "The port number the app listens on. This is used for healthchecks on the lb and pod."
   type        = number
   default     = 8080
+}
+
+variable "nodes" {
+  description = <<EOT
+  The configuration for which nodes to run the service on.
+  EOT
+  type = object({
+    allocation_tags = optional(string, null)
+    shared          = optional(bool, false)
+    selector    = optional(map(string), {})
+  })
+  default = {}
 }
 
 variable "lb" {
