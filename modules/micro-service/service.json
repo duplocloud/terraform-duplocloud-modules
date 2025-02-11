@@ -3,10 +3,18 @@
   "Resources": ${resources},
   "RestartPolicy": "${restart_policy}",
   "ImagePullPolicy": "${image.pullPolicy}",
+  %{if nodeSelector != "{}" }
   "NodeSelector": ${nodeSelector},
+  %{ endif }
+  %{if pod_annotations != "{}" }
   "PodAnnotations": ${pod_annotations},
+  %{ endif }
+  %{if pod_labels != "{}" }
   "PodLabels": ${pod_labels},
+  %{ endif }
+  %{if security_context != "{}" }
   "PodSecurityContext": ${security_context},
+  %{ endif }
   %{if health_check.enabled }
   "LivenessProbe": {
     "failureThreshold": ${health_check.failureThreshold},
