@@ -44,6 +44,49 @@ variable "port" {
   default     = 8080
 }
 
+variable "annotations" {
+  description = "Annotations to add to the service."
+  type        = map(string)
+  default     = {}
+}
+
+variable "labels" {
+  description = "Labels to add to the service."
+  type        = map(string)
+  default     = {}
+}
+
+variable "pod_annotations" {
+  description = "Annotations to add to the pod."
+  type        = map(string)
+  default     = {}
+}
+
+variable "pod_labels" {
+  description = "Labels to add to the pod."
+  type        = map(string)
+  default     = {}
+}
+
+variable "resources" {
+  description = "The resource requests and limits for the service."
+  type = object({
+    requests = optional(map(string))
+    limits   = optional(map(string))
+  })
+  default = {}
+}
+
+variable "security_context" {
+  description = "The security context for the service."
+  type = object({
+    run_as_user  = optional(number)
+    run_as_group = optional(number)
+    fs_group     = optional(number)
+  })
+  default = {}
+}
+
 variable "nodes" {
   description = <<EOT
   The configuration for which nodes to run the service on.
@@ -141,30 +184,52 @@ variable "config" {
   type = object({
     name    = optional(string, null)
     env     = optional(map(string), {})
-    files   = optional(map(string), null)
+    files   = optional(map(string), {})
     secrets = optional(list(string), [])
   })
   default = {}
 }
 
-# variable "pod_config" {
-#   type = object({
-#     Annotations = optional(map(string))
-#     Labels = optional(map(string))
-#     RestartPolicy = optional(string)
-#     PodSecurityContext = optional(any)
-#     Volumes = optional(list(any))
-#     DeploymentStrategy = optional(any)
-#   })
-#   default = {}
+variable "volume_mounts" {
+  description = <<EOT
+  The volume mounts for the service. This includes the name, mountPath, and subPath.
+
+  The `name` field is the name of the volume mount.
+
+  The `mountPath` field is the path to mount the volume to.
+
+  The `subPath` field is the path to the file to mount.
+  EOT
+  type = list(object({
+    name      = string
+    mountPath = string
+    subPath   = optional(string, null)
+  }))
+  default = []
+}
+
+# variable "volumes" {
+#   description = <<EOT
+#   The volumes for the service. This includes the name, type, and config.
+
+#   The `name` field is the name of the volume.
+
+#   The `type` field is the type of the volume. This can be one of the following: configMap, secret, or emptyDir.
+
+#   The `config` field is the configuration for the volume. This can be one of the following: name, items, or sizeLimit.
+#   EOT
+#   type = list(object({
+#     name   = string
+#     type   = string
+#     config = map(string)
+#   }))
+#   default = []
 # }
 
-# variable "container_config" {
-#   type = object({
-#     Resources = optional(object({
-#       limits = optional(map(string))
-#       requests = optional(map(string))
-#     }))
-#   })
-#   default = {}
-# }
+variable "volumes_json" {
+  description = <<EOT
+  The volumes for the service in JSON format. This is useful for when you want to use a JSON string to define the volumes.
+  EOT
+  type        = string
+  default     = "[]"
+}

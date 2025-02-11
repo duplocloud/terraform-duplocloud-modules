@@ -7,7 +7,23 @@ locals {
     health_check = var.health_check
     nodeSelector = jsonencode(var.nodes.selector)
     restart_policy = var.restart_policy
+    annotations = jsonencode(var.annotations)
+    labels = jsonencode(var.labels)
+    pod_labels = jsonencode(var.pod_labels)
+    pod_annotations = jsonencode(var.pod_annotations)
+    resources = jsonencode(var.resources)
+    security_context = jsonencode(var.security_context)
+    # volume_mounts = jsonencode(var.volume_mounts)
+    # volumes = jsonencode(local.volumes)
   }))
+  # volumes = concat(jsondecode(var.volumes_json), var.config.files == {} ? [] : [
+  #   {
+  #     name = "config"
+  #     configMap = {
+  #       name = duplocloud_k8_config_map.files[0].name
+  #     }
+  #   }
+  # ])
 }
 
 resource "duplocloud_duplo_service" "this" {
