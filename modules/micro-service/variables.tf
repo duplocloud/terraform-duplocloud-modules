@@ -177,15 +177,19 @@ variable "config" {
 
   The name here can be null, if so the services name will be used. 
 
-  The `env` field is a map of environment variables that will be added to the service by creating a ConfigMap and mounting it as envFrom.
+  The `env` field is a map of environment variables that will be added to the service by creating a ConfigMap and mounting it as envFrom. This is the ideal place to set an environment variable which can be determined within the terraform code. This is not the ideal place to store sensitive data nor data you would like to manually control after the initial deployment, use `secret_env` instead.
+
+  The `secret_env` field is a map of environment variables that will be added to the service by creating a Secret and mounting it as envFrom. The data is ignored so this is the ideal place to store sensitive data as well as data you would like to manually control after the initial deployment.
 
   The `files` field is a map of files that will be added to the service by creating a ConfigMap and mounting it as a volume. The key is the path to the file and the value is the content of the file.
   EOT
   type = object({
     name    = optional(string, null)
     env     = optional(map(string), {})
+    mountPath = optional(string, "/config")
     files   = optional(map(string), {})
     secrets = optional(list(string), [])
+    secret_env = optional(map(string), {})
   })
   default = {}
 }

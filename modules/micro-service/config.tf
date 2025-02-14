@@ -39,3 +39,17 @@ resource "duplocloud_k8_config_map" "files" {
   }
   
 }
+
+# the configurable secret. The data is ignored so users can change on the fly
+resource "duplocloud_tenant_secret" "this" {
+  tenant_id = local.tenant.id
+  name_suffix = "${local.config_name}-env"
+
+  data = jsonencode(var.config.secret_env)
+
+  lifecycle {
+    ignore_changes = [
+      data
+    ]
+  }
+}

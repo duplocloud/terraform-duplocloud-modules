@@ -13,9 +13,10 @@ locals {
     pod_annotations = jsonencode(var.pod_annotations)
     resources = jsonencode(var.resources)
     security_context = jsonencode(var.security_context)
-    # volume_mounts = jsonencode(var.volume_mounts)
+    volume_mounts = jsonencode(local.volume_mounts)
     # volumes = jsonencode(local.volumes)
   }))
+  volume_mounts = concat(var.volume_mounts, [])
   # volumes = concat(jsondecode(var.volumes_json), var.config.files == {} ? [] : [
   #   {
   #     name = "config"
