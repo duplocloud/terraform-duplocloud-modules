@@ -1,7 +1,7 @@
 resource "duplocloud_duplo_service_lbconfigs" "this" {
   count                       = var.lb.enabled ? 1 : 0
   tenant_id                   = local.tenant.id
-  replication_controller_name = duplocloud_duplo_service.this.name
+  replication_controller_name = local.service.name
   lbconfigs {
     lb_type          = local.alb_types[var.lb.type]
     is_native        = false

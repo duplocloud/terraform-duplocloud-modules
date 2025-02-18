@@ -3,6 +3,12 @@
   "Resources": ${resources},
   "RestartPolicy": "${restart_policy}",
   "ImagePullPolicy": "${image.pullPolicy}",
+  %{if command != "[]" }
+  "Command": ${command},
+  %{ endif }
+  %{if args != "[]" }
+  "Args": ${args},
+  %{ endif }
   %{if nodeSelector != "{}" }
   "NodeSelector": ${nodeSelector},
   %{ endif }

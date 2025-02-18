@@ -6,11 +6,11 @@ terraform {
       version = ">= 0.9.40"
     }
   }
-  backend "s3" {
-    workspace_key_prefix = "duplocloud/components"
-    key                  = "micro-service"
-    encrypt              = true
-  }
+  # backend "s3" {
+  #   workspace_key_prefix = "duplocloud/components"
+  #   key                  = "micro-service"
+  #   encrypt              = true
+  # }
 }
 provider "duplocloud" {}
 
@@ -23,6 +23,7 @@ module "some_service" {
   source = "../../modules/micro-service"
   tenant = var.tenant
   name   = "some-service"
+  command = ["echo"]
   image = {
     uri = "nginx:latest"
   }
@@ -30,4 +31,14 @@ module "some_service" {
   lb = {
     enabled = true
   }
+  jobs = {
+    before_update = {
+      enabled = true
+      args = ["before update"]
+    }
+  }
+}
+
+output "service" {
+  value = module.some_service.before_update.spec[0].template[0].spec[0].container[0]
 }

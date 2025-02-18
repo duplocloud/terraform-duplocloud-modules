@@ -28,7 +28,7 @@ resource "duplocloud_k8_config_map" "env" {
 
 # now build the configmap for the config.files if it exists
 resource "duplocloud_k8_config_map" "files" {
-  count     = var.config.files != null ? 1 : 0
+  count     = local.filemap_enabled ? 1 : 0
   tenant_id = local.tenant.id
   name      = "${local.config_name}-files"
   data      = jsonencode(var.config.files)
@@ -41,15 +41,23 @@ resource "duplocloud_k8_config_map" "files" {
 }
 
 # the configurable secret. The data is ignored so users can change on the fly
-resource "duplocloud_tenant_secret" "this" {
+# resource "duplocloud_tenant_secret" "this" {
+#   tenant_id = local.tenant.id
+#   name_suffix = "${local.config_name}-env"
+
+#   data = jsonencode(var.config.secret_env)
+
+#   lifecycle {
+#     ignore_changes = [
+#       data
+#     ]
+#   }
+# }
+
+module "secret_env" {
+  count = var.config.secret_env != {} ? 1 : 0
+  source = "../configuration"
+  name  = "${local.config_name}-env"
   tenant_id = local.tenant.id
-  name_suffix = "${local.config_name}-env"
-
-  data = jsonencode(var.config.secret_env)
-
-  lifecycle {
-    ignore_changes = [
-      data
-    ]
-  }
+  data = var.config.secret_env
 }

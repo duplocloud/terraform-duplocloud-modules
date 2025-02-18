@@ -7,26 +7,80 @@ variable "name" {
   type = string
 }
 
+variable "command" {
+  type    = list(string)
+  default = []
+}
+
+variable "args" {
+  type    = list(string)
+  default = []
+}
+
+variable "port" {
+  description = "The port number the app listens on. This is used for healthchecks on the lb and pod."
+  type        = number
+  default     = 80
+}
+
 variable "image" {
   description = <<EOT
-The configuration for which image and how to handle it.
-This includes the pull policy and the URI of the image. 
-EOT
+  The configuration for which image and how to handle it.
+  This includes the pull policy and the URI of the image. 
+
+  If `uri` is set then this is used. Otherwise set the `repo`, `registry`, and `tag` to build the URI. If none of these values are set, then it's assumed the app name is the repo, the registry is docker.io, and the tag is latest, ie `docker.io/myapp:latest`.
+
+  The `pullPolicy` field determines how the image is pulled. It can be one of the following: `Always`, `IfNotPresent`, or `Never`.
+
+  The `managed` field determines if the images is updated by Terraform or not. If it is not managed, the image will not be updated by Terraform and it's expected you are using the duploctl CLI to update the image.
+  EOT
   type = object({
-    uri        = optional(string)
+    uri        = optional(string, null)
+    tag        = optional(string, "latest")
     repo       = optional(string, null)
-    registry   = optional(string, null)
+    registry   = optional(string, "docker.io")
     pullPolicy = optional(string, "IfNotPresent")
+    managed    = optional(bool, true)
   })
+  default = {}
   validation {
     condition     = can(regex("^(Always|IfNotPresent|Never)$", var.image.pullPolicy))
     error_message = "The pull policy must be one of 'Always', 'IfNotPresent', or 'Never'"
   }
 }
 
-variable "replicas" {
-  type    = number
-  default = 1
+variable "scale" {
+  description = <<EOT
+  The configuration for how to scale the service.
+  This includes the replicas, min, and max.
+
+  The `auto` field determines if the service should be autoscaled. If it is not autoscaled, the replicas field will be used.
+
+  The metrics field is a list of metrics to use for autoscaling. This includes the type and target.
+  EOT
+  type = object({
+    auto     = optional(bool, false)
+    replicas = optional(number, 1)
+    min      = optional(number, 1)
+    max      = optional(number, 3)
+    metrics = optional(list(object({
+      type   = string
+      target = number
+    })), [])
+  })
+  default = {}
+
+  # make sure max is always greater than min
+  validation {
+    condition     = var.scale.max >= var.scale.min
+    error_message = "The max must be greater than the min."
+  }
+
+  # the replicas must be between min and max
+  validation {
+    condition     = var.scale.replicas >= var.scale.min && var.scale.replicas <= var.scale.max
+    error_message = "The replicas must be greater than or equal to min and less than or equal to max."
+  }
 }
 
 variable "restart_policy" {
@@ -36,12 +90,6 @@ variable "restart_policy" {
     condition     = can(regex("^(Always|OnFailure|Never)$", var.restart_policy))
     error_message = "The restart policy must be one of 'Always', 'OnFailure', or 'Never'"
   }
-}
-
-variable "port" {
-  description = "The port number the app listens on. This is used for healthchecks on the lb and pod."
-  type        = number
-  default     = 8080
 }
 
 variable "annotations" {
@@ -80,9 +128,9 @@ variable "resources" {
 variable "security_context" {
   description = "The security context for the service."
   type = object({
-    run_as_user  = optional(number)
-    run_as_group = optional(number)
-    fs_group     = optional(number)
+    run_as_user  = optional(number, null)
+    run_as_group = optional(number, null)
+    fs_group     = optional(number, null)
   })
   default = {}
 }
@@ -94,7 +142,7 @@ variable "nodes" {
   type = object({
     allocation_tags = optional(string, null)
     shared          = optional(bool, false)
-    selector    = optional(map(string), {})
+    selector        = optional(map(string), {})
   })
   default = {}
 }
@@ -126,7 +174,7 @@ See more docs here: https://registry.terraform.io/providers/duplocloud/duploclou
 EOT
   type = object({
     enabled      = optional(bool, false)
-    type         = optional(string, "alb")
+    type         = optional(string, "service")
     priority     = optional(number, 0)
     path_pattern = optional(string, "/*")
     port         = optional(number, null)
@@ -184,11 +232,11 @@ variable "config" {
   The `files` field is a map of files that will be added to the service by creating a ConfigMap and mounting it as a volume. The key is the path to the file and the value is the content of the file.
   EOT
   type = object({
-    name    = optional(string, null)
-    env     = optional(map(string), {})
-    mountPath = optional(string, "/config")
-    files   = optional(map(string), {})
-    secrets = optional(list(string), [])
+    name       = optional(string, null)
+    env        = optional(map(string), {})
+    mountPath  = optional(string, "/config")
+    files      = optional(map(string), {})
+    secrets    = optional(list(string), [])
     secret_env = optional(map(string), {})
   })
   default = {}
@@ -236,4 +284,37 @@ variable "volumes_json" {
   EOT
   type        = string
   default     = "[]"
+}
+
+variable "jobs" {
+  description = <<EOT
+  The jobs for the service. This includes the id, before_update, after_update, and cron.
+
+  The `id` field is the id of the job. If the field is not set, a random id will be generated. When running in a CI/CD pipeline, it's recommended to set this field to the Job ID in the pipeline so the k8s job and the job id from the pipeline match up. 
+  EOT
+  type = object({
+    id = optional(string, null)
+    before_update = optional(object({
+      enabled = optional(bool, false)
+      suffix  = optional(string, "-before-update")
+      command = optional(list(string), null)
+      args    = optional(list(string), [])
+      wait    = optional(bool, true)
+    }), {})
+    after_update = optional(object({
+      enabled = optional(bool, false)
+      suffix  = optional(string, "-after-update")
+      command = optional(list(string), null)
+      args    = optional(list(string), [])
+      wait    = optional(bool, true)
+    }), {})
+    cron = optional(object({
+      enabled  = optional(bool, false)
+      suffix   = optional(string, "")
+      schedule = optional(string, "0 1 * * *")
+      command  = optional(list(string), null)
+      args     = optional(list(string), [])
+    }), {})
+  })
+  default = {}
 }
