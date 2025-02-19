@@ -323,7 +323,7 @@ variable "jobs" {
 
   The `enabled` field will determine if the job is enabled or not. If the field is not set, the job will be enabled.
 
-  The `suffix` field will determine the suffix to add to the job name. If the field is not set, the suffix will be "-before-update".
+  The `name` field will determine the suffix to add to the job name and act as the id. If the field is not set, the name will be the event name.
 
   The `command` field will determine the command to run. If the field is not set, the command will use whatever is configured in the containers image or the var.command if it has been set.
 
@@ -335,7 +335,7 @@ variable "jobs" {
   EOT
   type = list(object({
     enabled  = optional(bool, true)
-    suffix   = optional(string, "-before-update")
+    name     = optional(string, null)
     command  = optional(list(string), null)
     args     = optional(list(string), [])
     wait     = optional(bool, true)

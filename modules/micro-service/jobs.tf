@@ -1,11 +1,11 @@
 # do the before update jobs
 resource "duplocloud_k8s_job" "before_update" {
-  for_each            = { for job in var.jobs : "${job.event}${job.suffix}" => job if job.enabled && job.event == "before-update" }
+  for_each            = { for job in var.jobs : "${job.name != null ? job.name : job.event}" => job if job.enabled && job.event == "before-update" }
   tenant_id           = local.tenant.id
   is_any_host_allowed = var.nodes.shared
   wait_for_completion = each.value.wait
   metadata {
-    name        = "${var.name}${each.value.suffix}-${local.release_id}"
+    name        = "${var.name}-${each.value.name != null ? each.value.name : each.value.event}-${local.release_id}"
     annotations = var.annotations
     labels      = var.labels
   }
