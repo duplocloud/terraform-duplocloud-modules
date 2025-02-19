@@ -1,5 +1,5 @@
 module "configurations" {
-  for_each    = { for idx, config in local.configurations : idx => config }
+  for_each    = { for idx, config in local.configurations : config.id => config }
   source      = "../configuration"
   name        = each.value.name
   type        = each.value.type
