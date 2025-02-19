@@ -40,6 +40,7 @@ locals {
     resources        = jsonencode(var.resources)
     security_context = jsonencode(var.security_context)
     volume_mounts    = jsonencode(local.volume_mounts)
+    volumes          = jsonencode(local.volumes)
     command          = jsonencode(var.command)
     args             = jsonencode(var.args)
     env              = jsonencode(local.container_env)

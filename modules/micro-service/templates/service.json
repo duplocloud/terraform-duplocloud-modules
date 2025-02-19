@@ -26,6 +26,9 @@
   %{if security_context != "{}" }
   "PodSecurityContext": ${security_context},
   %{ endif }
+  %{if volumes != "[]" }
+  "Volumes": ${volumes},
+  %{ endif }
   %{if volume_mounts != "[]" }
   "VolumesMounts": ${volume_mounts},
   %{ endif }
