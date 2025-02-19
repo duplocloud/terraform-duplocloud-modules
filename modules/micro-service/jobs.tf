@@ -46,29 +46,29 @@ resource "duplocloud_k8s_job" "before_update" {
             name  = "JOB_ID"
             value = local.job_id
           }
-          env_from {
-            # add the non secret tf managed env vars
-            dynamic "config_map_ref" {
-              for_each = var.config.env != {} ? [1] : []
-              content {
-                name = duplocloud_k8_config_map.env.name
-              }
-            }
-            # add the secret tf non managed env vars
-            dynamic "secret_ref" {
-              for_each = var.config.secrets
-              content {
-                name = secret.value
-              }
-            }
-            # add the named env from secrets
-            dynamic "secret_ref" {
-              for_each = var.config.secrets
-              content {
-                name = secret.value
-              }
-            }
-          }
+          # env_from {
+          #   # add the non secret tf managed env vars
+          #   dynamic "config_map_ref" {
+          #     for_each = var.config.env != {} ? [1] : []
+          #     content {
+          #       name = duplocloud_k8_config_map.env.name
+          #     }
+          #   }
+          #   # add the secret tf non managed env vars
+          #   dynamic "secret_ref" {
+          #     for_each = var.config.secrets
+          #     content {
+          #       name = secret.value
+          #     }
+          #   }
+          #   # add the named env from secrets
+          #   dynamic "secret_ref" {
+          #     for_each = var.config.secrets
+          #     content {
+          #       name = secret.value
+          #     }
+          #   }
+          # }
         }
       }
     }

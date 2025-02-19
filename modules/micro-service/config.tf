@@ -1,63 +1,45 @@
-locals {
-  # build from the single env configmap and all of the secret names
-  env_from = concat([
-    {
-      "configMapRef" : {
-        "name" : duplocloud_k8_config_map.env.name
-      }
-    }
-    ], [
-    for secret in var.config.secrets : {
-      secretRef : {
-        name = secret
-      }
-    }
-  ])
-}
-
-resource "duplocloud_k8_config_map" "env" {
+module "configurations" {
+  for_each = { for idx, config in local.configurations : idx => config }
+  source = "../configuration"
+  name  = each.value.name
+  description = each.value.description
   tenant_id = local.tenant.id
-  name      = "${local.config_name}-env"
-  data      = jsonencode(var.config.env)
-  timeouts {
-    create = "3m"
-    update = "3m"
-    delete = "3m"
-  }
+  class = each.value.class
+  data = each.value.data
+  value = each.value.value
+  csi = each.value.csi
+  managed = each.value.managed
 }
 
-# now build the configmap for the config.files if it exists
-resource "duplocloud_k8_config_map" "files" {
-  count     = local.filemap_enabled ? 1 : 0
-  tenant_id = local.tenant.id
-  name      = "${local.config_name}-files"
-  data      = jsonencode(var.config.files)
-  timeouts {
-    create = "3m"
-    update = "3m"
-    delete = "3m"
-  }
-  
-}
-
-# the configurable secret. The data is ignored so users can change on the fly
-# resource "duplocloud_tenant_secret" "this" {
+# module "config_env" {
+#   count     = var.config.env != {} ? 1 : 0
+#   source = "../configuration"
+#   name      = "${local.config_name}-env"
 #   tenant_id = local.tenant.id
-#   name_suffix = "${local.config_name}-env"
-
-#   data = jsonencode(var.config.secret_env)
-
-#   lifecycle {
-#     ignore_changes = [
-#       data
-#     ]
-#   }
+#   class = "configmap"
+#   data = var.config.env
+#   managed = true
 # }
 
-module "secret_env" {
-  count = var.config.secret_env != {} ? 1 : 0
-  source = "../configuration"
-  name  = "${local.config_name}-env"
-  tenant_id = local.tenant.id
-  data = var.config.secret_env
-}
+# now build the configmap for the config.files if it exists
+# module "config_files" {
+#   count     = local.filemap_enabled ? 1 : 0
+#   source = "../configuration"
+#   name      = "${local.config_name}-files"
+#   tenant_id = local.tenant.id
+#   class = "configmap"
+#   data = var.config.files
+#   managed = true
+# }
+
+# module "secret_env" {
+#   count = var.config.secret_env != {} ? 1 : 0
+#   source = "../configuration"
+#   name  = "${local.config_name}-env"
+#   tenant_id = local.tenant.id
+#   class = "aws-secret"
+#   data = var.config.secret_env
+#   csi = true
+#   managed = false
+# }
+

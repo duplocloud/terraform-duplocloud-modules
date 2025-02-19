@@ -1,7 +1,7 @@
 
-output "config_name" {
-  value = local.config_name
-  description = "The base name of the config."
+output "configurations" {
+  value = local.configurations
+  description = "The configurations object."
 }
 
 output "job_id" {

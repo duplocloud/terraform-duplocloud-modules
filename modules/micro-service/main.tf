@@ -1,6 +1,5 @@
 locals {
   tenant      = data.duplocloud_tenant.this
-  config_name = var.config.name != null ? var.config.name : var.name
   image_uri   = var.image.uri != null ? var.image.uri : "${var.image.registry}/${coalesce(var.image.repo, var.name)}:${var.image.tag}"
   # Check if we need to look up the cert arn
   do_cert_lookup = var.lb.enabled && var.lb.certificate != "" && !startswith(var.lb.certificate, "arn:aws:acm:")
@@ -17,6 +16,11 @@ locals {
     "nlb"                  = 6
     "target-group"         = 7
   }
+  configurations = [
+    for config in var.configurations : merge(config, {
+      name   = "${var.name}${config.suffix != null ? config.suffix : config.type == "environment" ? "-env" : "-files"}"
+    })
+  ]
   container_context = {
     env_from         = jsonencode(local.env_from)
     image            = var.image
@@ -33,21 +37,44 @@ locals {
     volume_mounts    = jsonencode(local.volume_mounts)
     command          = jsonencode(var.command)
     args             = jsonencode(var.args)
+    env              = jsonencode(local.container_env)
     # volumes = jsonencode(local.volumes)
   }
-  filemap_enabled = var.config.files != {} ? true : false
-  filemap_volume = local.filemap_enabled ? [
-    {
-      name = "config"
-      configMap = {
-        name = duplocloud_k8_config_map.files[0].name
+  volumes = concat(
+    jsondecode(var.volumes_json), []
+  )
+  # for each key value in var.env make a list of objects with name and value
+  container_env = [
+    for key, value in var.env : {
+      name  = key
+      value = value
+    }
+  ]
+  # build from the single env configmap and all of the secret names
+  env_from = concat([
+    # build an envFrom array for the container from only the type environment var.configurations
+    for config in local.configurations : {
+      configMapRef : {
+        name = config.name
+      }
+    } if config.type == "environment" && config.class == "configmap"
+  ],[
+    # build an envFrom array for the container from var.confurations only for type environment and the class can be anything but configmap
+    for config in local.configurations : {
+      secretRef : {
+        name = config.name
+      }
+    } if (
+      config.type == "environment" && 
+      (config.class == "secret" || (config.class != "configmap" && config.csi))
+    )
+  ], [
+    for secret in var.secrets : {
+      secretRef : {
+        name = secret
       }
     }
-  ] : []
-  volumes = concat(
-    local.filemap_volume,
-    jsondecode(var.volumes_json)
-  )
+  ])
 }
 
 # If the tenant_id is not set, we need to look it up with the tenant data block

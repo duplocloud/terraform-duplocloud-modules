@@ -1,8 +1,13 @@
 {
-  "EnvFrom": ${env_from},
-  "Resources": ${resources},
   "RestartPolicy": "${restart_policy}",
   "ImagePullPolicy": "${image.pullPolicy}",
+  "Resources": ${resources},
+  %{if env_from != "[]" }
+  "EnvFrom": ${env_from},
+  %{ endif }
+  %{if env != "[]" }
+  "Env": ${env},
+  %{ endif }
   %{if command != "[]" }
   "Command": ${command},
   %{ endif }

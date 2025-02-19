@@ -11,12 +11,6 @@ run "validate_defaults" {
     error_message = "The image was not set on the service correctly."
   }
 
-  # make sure the config_name is the same as the name
-  assert {
-    condition     = local.config_name == var.name
-    error_message = "The config name was not set correctly."
-  }
-
   # make sure external_port is 80 because no cert or lb is enabled
   assert {
     condition     = local.external_port == 80
@@ -44,5 +38,11 @@ run "validate_defaults" {
   assert {
     condition = length(duplocloud_k8s_job.before_update) == 0
     error_message = "There should be no before update job by default."
+  }
+
+  # make sure the local.env_from is an empty array by default
+  assert {
+    condition     = length(local.env_from) == 0
+    error_message = "The env_from should be an empty array by default."
   }
 }

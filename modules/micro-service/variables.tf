@@ -23,6 +23,12 @@ variable "port" {
   default     = 80
 }
 
+variable "env" {
+  description = "The environment variables to set on the container of the service."
+  type        = map(string)
+  default     = {}
+}
+
 variable "image" {
   description = <<EOT
   The configuration for which image and how to handle it.
@@ -219,27 +225,47 @@ variable "health_check" {
   default = {}
 }
 
-variable "config" {
-  description = <<EOT
-  The configuration for the service. This includes the name, environment variables, and files.
+# variable "config" {
+#   description = <<EOT
+#   The configuration for the service. This includes the name, environment variables, and files.
 
-  The name here can be null, if so the services name will be used. 
+#   The name here can be null, if so the services name will be used. 
 
-  The `env` field is a map of environment variables that will be added to the service by creating a ConfigMap and mounting it as envFrom. This is the ideal place to set an environment variable which can be determined within the terraform code. This is not the ideal place to store sensitive data nor data you would like to manually control after the initial deployment, use `secret_env` instead.
+#   The `env` field is a map of environment variables that will be added to the service by creating a ConfigMap and mounting it as envFrom. This is the ideal place to set an environment variable which can be determined within the terraform code. This is not the ideal place to store sensitive data nor data you would like to manually control after the initial deployment, use `secret_env` instead.
 
-  The `secret_env` field is a map of environment variables that will be added to the service by creating a Secret and mounting it as envFrom. The data is ignored so this is the ideal place to store sensitive data as well as data you would like to manually control after the initial deployment.
+#   The `secret_env` field is a map of environment variables that will be added to the service by creating a Secret and mounting it as envFrom. The data is ignored so this is the ideal place to store sensitive data as well as data you would like to manually control after the initial deployment.
 
-  The `files` field is a map of files that will be added to the service by creating a ConfigMap and mounting it as a volume. The key is the path to the file and the value is the content of the file.
-  EOT
-  type = object({
-    name       = optional(string, null)
-    env        = optional(map(string), {})
-    mountPath  = optional(string, "/config")
-    files      = optional(map(string), {})
-    secrets    = optional(list(string), [])
-    secret_env = optional(map(string), {})
-  })
-  default = {}
+#   The `files` field is a map of files that will be added to the service by creating a ConfigMap and mounting it as a volume. The key is the path to the file and the value is the content of the file.
+#   EOT
+#   type = object({
+#     name       = optional(string, null)
+#     env        = optional(map(string), {})
+#     mountPath  = optional(string, "/config")
+#     files      = optional(map(string), {})
+#     secrets    = optional(list(string), [])
+#     secret_env = optional(map(string), {})
+#   })
+#   default = {}
+# }
+
+variable "secrets" {
+  description = "The list of external secret names to be mounted as envFrom."
+  type        = list(string)
+  default     = []
+}
+
+variable "configurations" {
+  type = list(object({
+    suffix  = optional(string, null)
+    description = optional(string, null)
+    type    = optional(string, "environment") # environment or file
+    data    = optional(map(string), {})
+    value   = optional(string, null)
+    managed = optional(bool, true)
+    class   = optional(string, "configmap")
+    csi     = optional(bool, false)
+  }))
+  default = []
 }
 
 variable "volume_mounts" {
