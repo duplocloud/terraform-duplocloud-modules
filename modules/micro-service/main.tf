@@ -24,6 +24,7 @@ locals {
       csiMount    = config.enabled && contains(["aws-secret", "aws-ssm"], config.class) ? config.csi : false
       envFromWith = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "environment") ? config.class : null
       mountWith   = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "files") ? config.class : null
+      mountPath = config.mountPath != null ? config.mountPath : "/mnt/${config.name != null ? config.name : config.type == "environment" ? "env" : "files"}"
     })
   ]
   container_context = {
@@ -77,7 +78,7 @@ locals {
   volume_mounts       = concat(var.volume_mounts, [
     for config in local.configurations : {
       name      = config.id
-      mountPath = config.mountPath != null ? config.mountPath : "/mnt/${config.id}"
+      mountPath = config.mountPath
     } if config.enabled && (config.mountWith != null || config.csiMount)
   ])
   # for each key value in var.env make a list of objects with name and value
