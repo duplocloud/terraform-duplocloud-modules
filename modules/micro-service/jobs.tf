@@ -1,25 +1,11 @@
-locals {
-  job_id = var.jobs.id != null ? var.jobs.id : random_string.job_id[0].id
-}
-
-resource "random_string" "job_id" {
-  count = var.jobs.id == null ? 1 : 0
-  keepers = {
-    uuid = uuid()
-  }
-  length = 5
-  special = false
-  upper = false
-}
-
-# the before update job
+# do the before update jobs
 resource "duplocloud_k8s_job" "before_update" {
-  count     = var.jobs.before_update.enabled ? 1 : 0
+  for_each = { for job in var.jobs : "${job.event}${job.suffix}" => job if job.enabled && job.event == "before-update" }
   tenant_id = local.tenant.id
   is_any_host_allowed = var.nodes.shared
-  wait_for_completion = var.jobs.before_update.wait
+  wait_for_completion = each.value.wait
   metadata {
-    name = "${var.name}${var.jobs.before_update.suffix}-${local.job_id}"
+    name = "${var.name}${each.value.suffix}-${local.release_id}"
     annotations = var.annotations
     labels = var.labels
   }
@@ -31,44 +17,119 @@ resource "duplocloud_k8s_job" "before_update" {
       }
       spec {
         node_selector = var.nodes.selector
-        restart_policy = var.restart_policy
+        restart_policy = "OnFailure"
         security_context {
           fs_group = var.security_context.fs_group
           run_as_group = var.security_context.run_as_group
           run_as_user = var.security_context.run_as_user
         }
         container {
-          name  = "before_update"
+          name  = "before-update"
           image = local.image_uri
-          command = coalesce(var.jobs.before_update.command, var.command)
-          args = var.jobs.before_update.args
+          command = coalesce(each.value.command, var.command)
+          args = each.value.args
           env {
-            name  = "JOB_ID"
-            value = local.job_id
+            name  = "RELEASE_ID"
+            value = local.release_id
           }
-          # env_from {
-          #   # add the non secret tf managed env vars
-          #   dynamic "config_map_ref" {
-          #     for_each = var.config.env != {} ? [1] : []
-          #     content {
-          #       name = duplocloud_k8_config_map.env.name
-          #     }
-          #   }
-          #   # add the secret tf non managed env vars
-          #   dynamic "secret_ref" {
-          #     for_each = var.config.secrets
-          #     content {
-          #       name = secret.value
-          #     }
-          #   }
-          #   # add the named env from secrets
-          #   dynamic "secret_ref" {
-          #     for_each = var.config.secrets
-          #     content {
-          #       name = secret.value
-          #     }
-          #   }
-          # }
+          dynamic "env" {
+            for_each = var.env
+            content {
+              name  = env.key
+              value = env.value
+            }
+          }
+          env_from {
+            # add the configmap refferences
+            dynamic "config_map_ref" {
+              for_each = [
+                for config in local.configurations : config 
+                if config.envFromWith == "configmap"
+              ]
+              content {
+                name = config_map_ref.value.name
+              }
+            }
+            # add the secret references
+            dynamic "secret_ref" {
+              for_each = [
+                for config in local.configurations : config
+                if (config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
+              ]
+              content {
+                name = secret_ref.value.name
+              }
+            }
+            # finally add the external secrets list
+            dynamic "secret_ref" {
+              for_each = var.secrets
+              content {
+                name = secret_ref.value
+              }
+            }
+          }
+          # now the volume mounts for the var.volume_mount
+          dynamic "volume_mount" {
+            for_each = var.volume_mounts
+            content {
+              name = volume_mount.value.name
+              mount_path = volume_mount.value.mountPath
+            }
+          }
+          # now the volume mounts for the configurations
+          dynamic "volume_mount" {
+            for_each = [
+              for config in local.configurations : config
+              if config.enabled && (config.mountWith != null || config.csiMount)
+            ]
+            content {
+              name = volume_mount.value.id
+              mount_path = volume_mount.value.mountPath
+            }
+          }
+        }
+        # first mount the configmap file volumes
+        dynamic "volume" {
+          for_each = [
+            for config in local.configurations : config
+            if config.mountWith == "configmap"
+          ]
+          content {
+            name = volume.value.id
+            config_map {
+              name = volume.value.name
+            }
+          }
+        }
+        # then mount the secret file volumes
+        dynamic "volume" {
+          for_each = [
+            for config in local.configurations : config
+            if config.mountWith == "secret"
+          ]
+          content {
+            name = volume.value.id
+            secret {
+              secret_name = volume.value.name
+            }
+          }
+        }
+        # now the csi volumes
+        dynamic "volume" {
+          for_each = [
+            for config in local.configurations : config
+            if config.csiMount
+          ]
+          content {
+            name = volume.value.id
+            csi {
+              driver = "secrets-store.csi.k8s.io"
+              read_only = true
+              volume_attributes = {
+                secretProviderClass = volume.value.name
+              }
+            }
+          }
         }
       }
     }

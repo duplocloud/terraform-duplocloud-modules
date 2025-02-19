@@ -1,6 +1,7 @@
 locals {
-  tenant      = data.duplocloud_tenant.this
-  image_uri   = var.image.uri != null ? var.image.uri : "${var.image.registry}/${coalesce(var.image.repo, var.name)}:${var.image.tag}"
+  tenant     = data.duplocloud_tenant.this
+  release_id = var.release_id != null ? var.release_id : random_string.release_id[0].id
+  image_uri  = var.image.uri != null ? var.image.uri : "${var.image.registry}/${coalesce(var.image.repo, var.name)}:${var.image.tag}"
   # Check if we need to look up the cert arn
   do_cert_lookup = var.lb.enabled && var.lb.certificate != "" && !startswith(var.lb.certificate, "arn:aws:acm:")
   cert_arn       = local.do_cert_lookup ? data.duplocloud_plan_certificate.this[0].arn : var.lb.certificate
@@ -18,7 +19,11 @@ locals {
   }
   configurations = [
     for config in var.configurations : merge(config, {
-      name   = "${var.name}${config.suffix != null ? config.suffix : config.type == "environment" ? "-env" : "-files"}"
+      id          = config.name != null ? config.name : config.type == "environment" ? "env" : "files"
+      name        = "${var.name}${config.name != null ? "-${config.name}" : config.type == "environment" ? "-env" : "-files"}"
+      csiMount    = config.enabled && contains(["aws-secret", "aws-ssm"], config.class) ? config.csi : false
+      envFromWith = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "environment") ? config.class : null
+      mountWith   = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "files") ? config.class : null
     })
   ]
   container_context = {
@@ -40,9 +45,40 @@ locals {
     env              = jsonencode(local.container_env)
     # volumes = jsonencode(local.volumes)
   }
-  volumes = concat(
-    jsondecode(var.volumes_json), []
+  volumes = concat(jsondecode(var.volumes_json),
+    [
+      for config in local.configurations : {
+        name = config.id
+        configMap = {
+          name = config.name
+        }
+      } if config.mountWith == "configmap"
+      ], [
+      for config in local.configurations : {
+        name = config.id
+        secret = {
+          secretName = config.name
+        }
+      } if config.mountWith == "secret"
+    ], [
+      for config in local.configurations : {
+        name = config.id
+        csi = {
+          driver   = "secrets-store.csi.k8s.io"
+          readOnly = true
+          volumeAttributes = {
+            secretProviderClass = config.name
+          }
+        }
+      } if config.csiMount
+    ]
   )
+  volume_mounts       = concat(var.volume_mounts, [
+    for config in local.configurations : {
+      name      = config.id
+      mountPath = config.mountPath != null ? config.mountPath : "/mnt/${config.id}"
+    } if config.enabled && (config.mountWith != null || config.csiMount)
+  ])
   # for each key value in var.env make a list of objects with name and value
   container_env = [
     for key, value in var.env : {
@@ -57,18 +93,15 @@ locals {
       configMapRef : {
         name = config.name
       }
-    } if config.type == "environment" && config.class == "configmap"
-  ],[
+    } if config.envFromWith == "configmap"
+    ], [
     # build an envFrom array for the container from var.confurations only for type environment and the class can be anything but configmap
     for config in local.configurations : {
       secretRef : {
         name = config.name
       }
-    } if (
-      config.type == "environment" && 
-      (config.class == "secret" || (config.class != "configmap" && config.csi))
-    )
-  ], [
+    } if (config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
+    ], [
     for secret in var.secrets : {
       secretRef : {
         name = secret
@@ -87,4 +120,14 @@ data "duplocloud_plan_certificate" "this" {
   count   = local.do_cert_lookup ? 1 : 0
   name    = var.lb.certificate
   plan_id = local.tenant.plan_id
+}
+
+resource "random_string" "release_id" {
+  count = var.release_id == null ? 1 : 0
+  keepers = {
+    uuid = uuid()
+  }
+  length  = 5
+  special = false
+  upper   = false
 }

@@ -15,20 +15,30 @@ run "building_configurations" {
         BAZ = "buzz"
       }
       }, {
-      suffix = "-bubbles"
-      class  = "aws-secret"
-      csi    = true
-      managed = false
+      name      = "bubbles"
+      class       = "aws-secret"
+      csi         = true
+      managed     = false
       description = "This would build an aws secret with a k8s secret using a the csi driver. This then is mounted as a colume and envFrom"
       data = {
         BUBBLES = "are cool"
       }
       }, {
-      class       = "configmap"
       type        = "files"
-      description = "This should not show up in envFrom because this configuration is for a set of files."
+      description = "This should not show up in envFrom because this configuration is for a set of files. It should show up in the volumes though."
       data = {
         "hello.txt" = "hello world"
+      }
+      }, {
+      enabled     = false
+      name      = "disabled"
+      class       = "aws-ssm"
+      csi         = false
+      managed     = true
+      type        = "environment"
+      description = "This should be disabled so it should not be in the envfrom"
+      data = {
+        "HELLO" = "world"
       }
     }]
   }
@@ -44,9 +54,10 @@ run "building_configurations" {
 
   assert {
     condition = (
-      length(local.configurations) == 3 &&
-      length(local.env_from) == 3 &&
-      length(module.configurations) == 3
+      length(local.configurations) == 4 &&
+      # bc 1 external secret and two enabled configurations with type environment
+      length(local.env_from) == 3 && 
+      length(module.configurations) == 4
     )
     error_message = "The configurations was not set correctly."
   }
@@ -67,6 +78,26 @@ run "building_configurations" {
       }
     }]
     error_message = "The env_from was not set correctly."
+  }
+
+  # make sure the volumes look correct
+  assert {
+    condition = length(local.volumes) == 2 && local.volumes == [{
+      name = "files"
+      configMap = {
+        name = "myapp-files"
+      }
+    },{
+        name = "bubbles"
+        csi = {
+          driver   = "secrets-store.csi.k8s.io"
+          readOnly = true
+          volumeAttributes = {
+            secretProviderClass = "myapp-bubbles"
+          }
+        }
+      }]
+    error_message = "The volumes was not set correctly."
   }
 
 }

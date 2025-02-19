@@ -15,6 +15,19 @@ variable "description" {
   nullable = true
 }
 
+variable "type" {
+  description = "The type of the config."
+  type        = string
+  default     = "environment" # or files
+  # make sure the value is one of the accepted values
+  validation {
+    condition = contains([
+      "environment", "files"
+    ], var.type)
+    error_message = "The type must be one of the following: environment, files."
+  }
+}
+
 variable "class" {
   description = "The class of the config."
   type        = string

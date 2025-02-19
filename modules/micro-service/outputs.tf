@@ -4,7 +4,7 @@ output "configurations" {
   description = "The configurations object."
 }
 
-output "job_id" {
-  value = local.job_id
+output "release_id" {
+  value = local.release_id
   description = "The job id."
 }

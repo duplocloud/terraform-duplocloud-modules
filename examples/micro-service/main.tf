@@ -23,22 +23,31 @@ module "some_service" {
   source = "../../modules/micro-service"
   tenant = var.tenant
   name   = "some-service"
-  command = ["echo"]
   image = {
     uri = "nginx:latest"
   }
   port = 80
   lb = {
-    enabled = true
+    enabled = false
   }
+  configurations = [{
+    data = {
+      MESSAGE = "Hello World"
+    }
+  }, {
+    class = "aws-secret"
+    csi  = true
+    managed = false
+    description = "An AWS secret mounted to a pod using the CSI driver. Values are ignored by TF so users can manage them in the AWS console. Terraform only initializes the default values and required keys on creation."
+    data = {
+      PASSWORD = "bar"
+    }
+  }]
   jobs = {
     before_update = {
       enabled = true
+      command = ["echo"]
       args = ["before update"]
     }
   }
-}
-
-output "service" {
-  value = module.some_service.before_update.spec[0].template[0].spec[0].container[0]
 }

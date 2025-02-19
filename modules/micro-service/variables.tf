@@ -7,6 +7,15 @@ variable "name" {
   type = string
 }
 
+variable "release_id" {
+  description = <<EOT
+  The `release_id` field is the id of the current build. If the field is not set, a random id will be generated. When running in a CI/CD pipeline, it's recommended to set this field to the Job ID in the pipeline so the k8s job and the job id from the pipeline match up. 
+  EOT
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "command" {
   type    = list(string)
   default = []
@@ -225,29 +234,6 @@ variable "health_check" {
   default = {}
 }
 
-# variable "config" {
-#   description = <<EOT
-#   The configuration for the service. This includes the name, environment variables, and files.
-
-#   The name here can be null, if so the services name will be used. 
-
-#   The `env` field is a map of environment variables that will be added to the service by creating a ConfigMap and mounting it as envFrom. This is the ideal place to set an environment variable which can be determined within the terraform code. This is not the ideal place to store sensitive data nor data you would like to manually control after the initial deployment, use `secret_env` instead.
-
-#   The `secret_env` field is a map of environment variables that will be added to the service by creating a Secret and mounting it as envFrom. The data is ignored so this is the ideal place to store sensitive data as well as data you would like to manually control after the initial deployment.
-
-#   The `files` field is a map of files that will be added to the service by creating a ConfigMap and mounting it as a volume. The key is the path to the file and the value is the content of the file.
-#   EOT
-#   type = object({
-#     name       = optional(string, null)
-#     env        = optional(map(string), {})
-#     mountPath  = optional(string, "/config")
-#     files      = optional(map(string), {})
-#     secrets    = optional(list(string), [])
-#     secret_env = optional(map(string), {})
-#   })
-#   default = {}
-# }
-
 variable "secrets" {
   description = "The list of external secret names to be mounted as envFrom."
   type        = list(string)
@@ -255,15 +241,34 @@ variable "secrets" {
 }
 
 variable "configurations" {
+  description = <<EOT
+  A list of configurations for an application. These can be configmaps or secrets.
+
+  With the `enable` field you can enable or disable the configuration from be configured with the app itself. When disabled, the resource is not deleted, it's just not mounted to the service anymore. Maybe you just are not ready yet or maybe you are trying to different ideas and don't want to delete the old one.
+
+  The `managed` field determines if the configuration is managed by Terraform or not. If it is not managed, the configuration will not be updated by Terraform and it's expected you are using the duploctl CLI to update the configuration.
+
+  The `data` key is a map of key value pairs that will be added to the configuration. 
+  Use the `value` field if you want to set a single value for the configuration as a raw string. 
+  
+  If the `type` field is environment which is the default, then the data will be added as environment variables. If the `type` is file, then the data will be added as files.
+
+  If the `type` is file, then you can optionally set where the mountPath is. If not set, it will be /mnt/<name>.
+
+  If the class supports CSI, then the `csi` field can be set to true to use the CSI driver to mount the secret as a volume or envFrom. This makes a corresponding k8s secret alongside the csi compatibile secret.
+  EOT
   type = list(object({
-    suffix  = optional(string, null)
+    enabled     = optional(bool, true)
+    external    = optional(bool, false)
+    name        = optional(string, null)
     description = optional(string, null)
-    type    = optional(string, "environment") # environment or file
-    data    = optional(map(string), {})
-    value   = optional(string, null)
-    managed = optional(bool, true)
-    class   = optional(string, "configmap")
-    csi     = optional(bool, false)
+    type        = optional(string, "environment") # environment or file
+    data        = optional(map(string), {})
+    value       = optional(string, null)
+    managed     = optional(bool, true)
+    class       = optional(string, "configmap")
+    csi         = optional(bool, false)
+    mountPath   = optional(string, null)
   }))
   default = []
 }
@@ -314,33 +319,33 @@ variable "volumes_json" {
 
 variable "jobs" {
   description = <<EOT
-  The jobs for the service. This includes the id, before_update, after_update, and cron.
+  The jobs for the service. 
 
-  The `id` field is the id of the job. If the field is not set, a random id will be generated. When running in a CI/CD pipeline, it's recommended to set this field to the Job ID in the pipeline so the k8s job and the job id from the pipeline match up. 
+  The `enabled` field will determine if the job is enabled or not. If the field is not set, the job will be enabled.
+
+  The `suffix` field will determine the suffix to add to the job name. If the field is not set, the suffix will be "-before-update".
+
+  The `command` field will determine the command to run. If the field is not set, the command will use whatever is configured in the containers image or the var.command if it has been set.
+
+  The `args` field will determine the arguments to pass to the command. If the field is not set, the args will be an empty list.
+
+  The `wait` field will determine if the job should wait for completion. If the field is not set, the job will wait for completion.
+
+  The `event` field will determine the event to trigger the job. If the field is not set, the event will be "before-update". This can be one of the following: before-update, after-update, before-delete, after-delete.
   EOT
-  type = object({
-    id = optional(string, null)
-    before_update = optional(object({
-      enabled = optional(bool, false)
-      suffix  = optional(string, "-before-update")
-      command = optional(list(string), null)
-      args    = optional(list(string), [])
-      wait    = optional(bool, true)
-    }), {})
-    after_update = optional(object({
-      enabled = optional(bool, false)
-      suffix  = optional(string, "-after-update")
-      command = optional(list(string), null)
-      args    = optional(list(string), [])
-      wait    = optional(bool, true)
-    }), {})
-    cron = optional(object({
-      enabled  = optional(bool, false)
-      suffix   = optional(string, "")
-      schedule = optional(string, "0 1 * * *")
-      command  = optional(list(string), null)
-      args     = optional(list(string), [])
-    }), {})
-  })
-  default = {}
+  type = list(object({
+    enabled  = optional(bool, true)
+    suffix   = optional(string, "-before-update")
+    command  = optional(list(string), null)
+    args     = optional(list(string), [])
+    wait     = optional(bool, true)
+    event    = optional(string, "before-update")
+    schedule = optional(string, "0 1 * * *")
+  }))
+  default = []
+
+  validation {
+    condition     = alltrue([for job in var.jobs : can(regex("^(before-update|after-update|before-delete|after-delete)$", job.event))])
+    error_message = "The event must be one of 'before-update', 'after-update', 'before-delete', or 'after-delete'"
+  }
 }
