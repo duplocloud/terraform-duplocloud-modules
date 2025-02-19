@@ -1,33 +1,33 @@
 # do the before update jobs
 resource "duplocloud_k8s_job" "before_update" {
-  for_each = { for job in var.jobs : "${job.event}${job.suffix}" => job if job.enabled && job.event == "before-update" }
-  tenant_id = local.tenant.id
+  for_each            = { for job in var.jobs : "${job.event}${job.suffix}" => job if job.enabled && job.event == "before-update" }
+  tenant_id           = local.tenant.id
   is_any_host_allowed = var.nodes.shared
   wait_for_completion = each.value.wait
   metadata {
-    name = "${var.name}${each.value.suffix}-${local.release_id}"
+    name        = "${var.name}${each.value.suffix}-${local.release_id}"
     annotations = var.annotations
-    labels = var.labels
+    labels      = var.labels
   }
   spec {
     template {
       metadata {
         annotations = var.pod_annotations
-        labels = var.pod_labels
+        labels      = var.pod_labels
       }
       spec {
-        node_selector = var.nodes.selector
+        node_selector  = var.nodes.selector
         restart_policy = "OnFailure"
         security_context {
-          fs_group = var.security_context.fs_group
+          fs_group     = var.security_context.fs_group
           run_as_group = var.security_context.run_as_group
-          run_as_user = var.security_context.run_as_user
+          run_as_user  = var.security_context.run_as_user
         }
         container {
-          name  = "before-update"
-          image = local.image_uri
+          name    = "before-update"
+          image   = local.image_uri
           command = coalesce(each.value.command, var.command)
-          args = each.value.args
+          args    = each.value.args
           env {
             name  = "RELEASE_ID"
             value = local.release_id
@@ -39,32 +39,33 @@ resource "duplocloud_k8s_job" "before_update" {
               value = env.value
             }
           }
-          env_from {
-            # add the configmap refferences
-            dynamic "config_map_ref" {
-              for_each = [
-                for config in local.configurations : config 
-                if config.envFromWith == "configmap"
-              ]
-              content {
-                name = config_map_ref.value.name
+          dynamic "env_from" {
+            for_each = [
+              for config in local.configurations : config
+              if config.envFromWith == "configmap"
+            ]
+            content {
+              config_map_ref {
+                name = env_from.value.name
               }
             }
-            # add the secret references
-            dynamic "secret_ref" {
-              for_each = [
-                for config in local.configurations : config
-                if (config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
-              ]
-              content {
-                name = secret_ref.value.name
+          }
+          dynamic "env_from" {
+            for_each = [
+              for config in local.configurations : config
+              if(config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
+            ]
+            content {
+              secret_ref {
+                name = env_from.value.name
               }
             }
-            # finally add the external secrets list
-            dynamic "secret_ref" {
-              for_each = var.secrets
-              content {
-                name = secret_ref.value
+          }
+          dynamic "env_from" {
+            for_each = var.secrets
+            content {
+              secret_ref {
+                name = env_from.value
               }
             }
           }
@@ -72,7 +73,7 @@ resource "duplocloud_k8s_job" "before_update" {
           dynamic "volume_mount" {
             for_each = var.volume_mounts
             content {
-              name = volume_mount.value.name
+              name       = volume_mount.value.name
               mount_path = volume_mount.value.mountPath
             }
           }
@@ -83,7 +84,7 @@ resource "duplocloud_k8s_job" "before_update" {
               if config.enabled && (config.mountWith != null || config.csiMount)
             ]
             content {
-              name = volume_mount.value.id
+              name       = volume_mount.value.id
               mount_path = volume_mount.value.mountPath
             }
           }
@@ -123,7 +124,7 @@ resource "duplocloud_k8s_job" "before_update" {
           content {
             name = volume.value.id
             csi {
-              driver = "secrets-store.csi.k8s.io"
+              driver    = "secrets-store.csi.k8s.io"
               read_only = true
               volume_attributes = {
                 secretProviderClass = volume.value.name
