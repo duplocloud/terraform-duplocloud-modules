@@ -17,16 +17,6 @@ locals {
     "nlb"                  = 6
     "target-group"         = 7
   }
-  configurations = [
-    for config in var.configurations : merge(config, {
-      id          = config.name != null ? config.name : config.type == "environment" ? "env" : "files"
-      name        = "${var.name}${config.name != null ? "-${config.name}" : config.type == "environment" ? "-env" : "-files"}"
-      csiMount    = config.enabled && contains(["aws-secret", "aws-ssm"], config.class) ? config.csi : false
-      envFromWith = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "environment") ? config.class : null
-      mountWith   = (config.enabled && contains(["configmap", "secret"], config.class) && config.type == "files") ? config.class : null
-      mountPath = config.mountPath != null ? config.mountPath : "/mnt/${config.name != null ? config.name : config.type == "environment" ? "env" : "files"}"
-    })
-  ]
   container_context = {
     env_from         = jsonencode(local.env_from)
     image            = var.image
@@ -47,39 +37,13 @@ locals {
     env              = jsonencode(local.container_env)
     # volumes = jsonencode(local.volumes)
   }
-  volumes = concat(jsondecode(var.volumes_json),
-    [
-      for config in local.configurations : {
-        name = config.id
-        configMap = {
-          name = config.name
-        }
-      } if config.mountWith == "configmap"
-      ], [
-      for config in local.configurations : {
-        name = config.id
-        secret = {
-          secretName = config.name
-        }
-      } if config.mountWith == "secret"
-    ], [
-      for config in local.configurations : {
-        name = config.id
-        csi = {
-          driver   = "secrets-store.csi.k8s.io"
-          readOnly = true
-          volumeAttributes = {
-            secretProviderClass = config.name
-          }
-        }
-      } if config.csiMount
-    ]
-  )
+  volumes = concat([
+    for config in module.configurations : config.volume if config.volume != null
+  ],[
+    # TODO pvc volume
+  ])
   volume_mounts       = concat(var.volume_mounts, [
-    for config in local.configurations : {
-      name      = config.id
-      mountPath = config.mountPath
-    } if config.enabled && (config.mountWith != null || config.csiMount)
+    for config in module.configurations : config.volumeMount if config.volumeMount != null
   ])
   # for each key value in var.env make a list of objects with name and value
   container_env = [
@@ -90,20 +54,8 @@ locals {
   ]
   # build from the single env configmap and all of the secret names
   env_from = concat([
-    # build an envFrom array for the container from only the type environment var.configurations
-    for config in local.configurations : {
-      configMapRef : {
-        name = config.name
-      }
-    } if config.envFromWith == "configmap"
-    ], [
-    # build an envFrom array for the container from var.confurations only for type environment and the class can be anything but configmap
-    for config in local.configurations : {
-      secretRef : {
-        name = config.name
-      }
-    } if (config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
-    ], [
+    for config in module.configurations : config.envFrom if config.envFrom != null
+  ], [
     for secret in var.secrets : {
       secretRef : {
         name = secret

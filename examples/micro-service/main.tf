@@ -22,7 +22,7 @@ variable "tenant" {
 module "some_service" {
   source = "../../modules/micro-service"
   tenant = var.tenant
-  name   = "some-service"
+  name   = "myapp"
   image = {
     uri = "nginx:latest"
   }
@@ -30,24 +30,49 @@ module "some_service" {
   lb = {
     enabled = false
   }
+  secrets = [
+    "some-other-secret"
+  ]
   configurations = [{
     data = {
-      MESSAGE = "Hello World"
+      BAZ = "buzz"
     }
-  }, {
-    class = "aws-secret"
-    csi  = true
-    managed = false
-    description = "An AWS secret mounted to a pod using the CSI driver. Values are ignored by TF so users can manage them in the AWS console. Terraform only initializes the default values and required keys on creation."
+    }, {
+    name        = "bubbles"
+    class       = "aws-secret"
+    csi         = true
+    managed     = false
+    description = "This would build an aws secret with a k8s secret using a the csi driver. This then is mounted as a colume and envFrom"
     data = {
-      PASSWORD = "bar"
+      BUBBLES = "are cool"
+    }
+    }, {
+    type        = "files"
+    class       = "secret"
+    description = "This should not show up in envFrom because this configuration is for a set of files. It should show up in the volumes though."
+    data = {
+      "hello.txt" = "hello world"
+    }
+    }, {
+    enabled     = false
+    name        = "disabled"
+    class       = "aws-ssm"
+    csi         = false
+    managed     = true
+    type        = "environment"
+    description = "This should be disabled so it should not be in the envfrom"
+    data = {
+      "HELLO" = "world"
     }
   }]
-  jobs = {
-    before_update = {
-      enabled = true
-      command = ["echo"]
-      args = ["before update"]
-    }
-  }
+  jobs = [{
+    enabled = true
+    command = ["echo"]
+    args    = ["before update"]
+  }]
+}
+
+output "service" {
+  value       = module.some_service
+  description = "The service object."
 }

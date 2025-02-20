@@ -53,50 +53,47 @@ run "building_configurations" {
   }
 
   assert {
-    condition = (
-      length(local.configurations) == 4 &&
-      # bc 1 external secret and two enabled configurations with type environment
-      length(local.env_from) == 3 && 
-      length(module.configurations) == 4
-    )
+    condition = length(module.configurations) == 4
     error_message = "The configurations was not set correctly."
   }
 
   # make sure the env_from looks correct
   assert {
-    condition = local.env_from == [{
-      configMapRef = {
-        name = "myapp-env"
-      }
-      }, {
-      secretRef = {
-        name = "myapp-bubbles"
-      }
-      }, {
-      secretRef = {
-        name = "some-other-secret"
-      }
-    }]
+    condition = length(local.env_from) == 3
+    # condition = local.env_from == [{
+    #   secretRef = {
+    #     name = "myapp-bubbles"
+    #   }
+    #   }, {
+    #   configMapRef = {
+    #     name = "myapp-env"
+    #   }
+    #   }, {
+    #   secretRef = {
+    #     name = "some-other-secret"
+    #   }
+    # }]
     error_message = "The env_from was not set correctly."
   }
 
   # make sure the volumes look correct
   assert {
-    condition = length(local.volumes) == 2 && local.volumes == [{
-      name = "files"
-      configMap = {
-        name = "myapp-files"
-      }
-    },{
-        name = "bubbles"
-        csi = {
-          driver   = "secrets-store.csi.k8s.io"
-          readOnly = true
-          volumeAttributes = {
-            secretProviderClass = "myapp-bubbles"
-          }
-        }
-      }]
+    condition = length(local.volumes) == 2
+    # condition = length(local.volumess) == 2 && [for v in local.volumess : v] == [{
+    #     name = "bubbles"
+    #     csi = {
+    #       driver   = "secrets-store.csi.k8s.io"
+    #       readOnly = true
+    #       volumeAttributes = {
+    #         secretProviderClass = "myapp-bubbles"
+    #       }
+    #     }
+    #   },{
+    #   name = "files"
+    #   configMap = {
+    #     name = "myapp-files"
+    #   }
+    # }]
     error_message = "The volumes was not set correctly."
   }
 

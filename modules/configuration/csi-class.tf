@@ -1,7 +1,7 @@
 resource "duplocloud_k8_secret_provider_class" "aws" {
-  count           = contains(["aws-secret", "aws-ssm"], var.class) && var.csi ? 1 : 0
+  count           = local.csi ? 1 : 0
   tenant_id       = var.tenant_id
-  name            = var.name
+  name            = local.name
   secret_provider = "aws"
 
   # Here we use jmespath to alias the individual fields in the secret to names that are
@@ -11,7 +11,7 @@ resource "duplocloud_k8_secret_provider_class" "aws" {
   parameters = yamlencode(
     [
       {
-        objectName = var.name,
+        objectName = local.realName,
         objectType = var.class == "aws-secret" ? "secretsmanager" : "ssmparameter",
         jmesPath = [
           for key in local.keys : {
@@ -29,7 +29,7 @@ resource "duplocloud_k8_secret_provider_class" "aws" {
   # with their corresponding secret values.
 
   secret_object {
-    name = var.name
+    name = local.name
     type = "Opaque"
     dynamic "data" {
       for_each = local.keys

@@ -40,94 +40,56 @@ resource "duplocloud_k8s_job" "before_update" {
             }
           }
           dynamic "env_from" {
-            for_each = [
-              for config in local.configurations : config
-              if config.envFromWith == "configmap"
-            ]
+            for_each = local.env_from
             content {
-              config_map_ref {
-                name = env_from.value.name
+              # do the same for the configmaps
+              dynamic "config_map_ref" {
+                for_each = contains(keys(env_from.value), "configMapRef") ? [env_from.value.configMapRef] : []
+                content {
+                  name = config_map_ref.value.name
+                }
+              }
+              # use a dynamic block to add the secret ref if the envFrom has a key named secret_ref
+              dynamic "secret_ref" {
+                for_each = contains(keys(env_from.value), "secretRef") ? [env_from.value.secretRef] : []
+                content {
+                  name = secret_ref.value.name
+                }
               }
             }
           }
-          dynamic "env_from" {
-            for_each = [
-              for config in local.configurations : config
-              if(config.envFromWith == "secret" || (config.csiMount && config.type == "environment"))
-            ]
-            content {
-              secret_ref {
-                name = env_from.value.name
-              }
-            }
-          }
-          dynamic "env_from" {
-            for_each = var.secrets
-            content {
-              secret_ref {
-                name = env_from.value
-              }
-            }
-          }
-          # now the volume mounts for the var.volume_mount
+          # now the volume mounts
           dynamic "volume_mount" {
-            for_each = var.volume_mounts
+            for_each = local.volume_mounts
             content {
               name       = volume_mount.value.name
               mount_path = volume_mount.value.mountPath
-            }
-          }
-          # now the volume mounts for the configurations
-          dynamic "volume_mount" {
-            for_each = [
-              for config in local.configurations : config
-              if config.enabled && (config.mountWith != null || config.csiMount)
-            ]
-            content {
-              name       = volume_mount.value.id
-              mount_path = volume_mount.value.mountPath
+              read_only = volume_mount.value.readOnly
             }
           }
         }
-        # first mount the configmap file volumes
         dynamic "volume" {
-          for_each = [
-            for config in local.configurations : config
-            if config.mountWith == "configmap"
-          ]
+          for_each = local.volumes
           content {
-            name = volume.value.id
-            config_map {
-              name = volume.value.name
+            name = volume.value.name
+            dynamic "config_map" {
+              for_each = contains(keys(volume.value), "configMap") ? [volume.value.configMap] : []
+              content {
+                name = config_map.value.name
+              }
             }
-          }
-        }
-        # then mount the secret file volumes
-        dynamic "volume" {
-          for_each = [
-            for config in local.configurations : config
-            if config.mountWith == "secret"
-          ]
-          content {
-            name = volume.value.id
-            secret {
-              secret_name = volume.value.name
+            dynamic "secret" {
+              for_each = contains(keys(volume.value), "secret") ? [volume.value.secret] : []
+              content {
+                secret_name = secret.value.secretName
+              }
             }
-          }
-        }
-        # now the csi volumes
-        dynamic "volume" {
-          for_each = [
-            for config in local.configurations : config
-            if config.csiMount
-          ]
-          content {
-            name = volume.value.id
-            csi {
-              driver    = "secrets-store.csi.k8s.io"
-              read_only = true
-              volume_attributes = {
-                secretProviderClass = volume.value.name
+            dynamic "csi" {
+              for_each = contains(keys(volume.value), "csi") ? [volume.value.csi] : []
+              content {
+                driver    = csi.value.driver
+                read_only = csi.value.readOnly
+                volume_attributes = csi.value.volumeAttributes
               }
             }
           }
