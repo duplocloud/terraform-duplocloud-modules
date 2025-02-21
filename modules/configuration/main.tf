@@ -32,7 +32,7 @@ locals {
         driver   = "secrets-store.csi.k8s.io"
         readOnly = true
         volumeAttributes = {
-          secretProviderClass = local.realName
+          secretProviderClass = local.name
         }
       }
     } : null
