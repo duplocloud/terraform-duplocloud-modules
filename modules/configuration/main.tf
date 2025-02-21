@@ -16,12 +16,12 @@ locals {
   envFromMap = {
     configmap = var.enabled && var.type == "environment" && var.class == "configmap" ? {
       configMapRef = {
-        name = local.realName
+        name = local.name
       }
     } : null
     secret = var.enabled && var.type == "environment" && (var.class == "secret" || local.csi) ? {
       secretRef = {
-        name = local.realName
+        name = local.name
       }
     } : null
   }
