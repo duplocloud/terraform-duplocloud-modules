@@ -1,6 +1,6 @@
 locals {
   tenant     = data.duplocloud_tenant.this
-  release_id = var.release_id != null ? var.release_id : random_string.release_id[0].id
+  release_id = random_string.release_id[0].id
   image_uri  = var.image.uri != null ? var.image.uri : "${var.image.registry}/${coalesce(var.image.repo, var.name)}:${var.image.tag}"
   # Check if we need to look up the cert arn
   do_cert_lookup = var.lb.enabled && var.lb.certificate != "" && !startswith(var.lb.certificate, "arn:aws:acm:")
@@ -79,7 +79,7 @@ data "duplocloud_plan_certificate" "this" {
 resource "random_string" "release_id" {
   count = var.release_id == null ? 1 : 0
   keepers = {
-    uuid = uuid()
+    strategy = var.release_id != null ? var.release_id : local.image_uri
   }
   length  = 5
   special = false
