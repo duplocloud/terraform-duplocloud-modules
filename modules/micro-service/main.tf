@@ -39,12 +39,13 @@ locals {
   }
   volumes = concat([
     for config in module.configurations : config.volume if config.volume != null
-  ],[
+    ], [
     # TODO pvc volume
-  ])
-  volume_mounts       = concat(var.volume_mounts, [
-    for config in module.configurations : config.volumeMount if config.volumeMount != null
-  ])
+  ], jsonencode(var.volumes_json))
+  volume_mounts = concat([
+    for config in module.configurations : config.volumeMount 
+    if config.volumeMount != null
+  ], var.volume_mounts)
   # for each key value in var.env make a list of objects with name and value
   container_env = [
     for key, value in var.env : {
@@ -54,8 +55,9 @@ locals {
   ]
   # build from the single env configmap and all of the secret names
   env_from = concat([
-    for config in module.configurations : config.envFrom if config.envFrom != null
-  ], [
+    for config in module.configurations : config.envFrom 
+    if config.envFrom != null
+    ], [
     for secret in var.secrets : {
       secretRef : {
         name = secret

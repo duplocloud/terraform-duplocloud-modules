@@ -1,6 +1,6 @@
 # do the before update jobs
 resource "duplocloud_k8s_job" "before_update" {
-  for_each            = { for job in var.jobs : "${job.name != null ? job.name : job.event}" => job if job.enabled && job.event == "before-update" }
+  for_each            = { for job in var.jobs : job.name != null ? job.name : job.event => job if job.enabled && job.event == "before-update" }
   tenant_id           = local.tenant.id
   is_any_host_allowed = var.nodes.shared
   wait_for_completion = each.value.wait
@@ -64,7 +64,7 @@ resource "duplocloud_k8s_job" "before_update" {
             content {
               name       = volume_mount.value.name
               mount_path = volume_mount.value.mountPath
-              read_only = volume_mount.value.readOnly
+              read_only  = volume_mount.value.readOnly
             }
           }
         }
@@ -87,8 +87,8 @@ resource "duplocloud_k8s_job" "before_update" {
             dynamic "csi" {
               for_each = contains(keys(volume.value), "csi") ? [volume.value.csi] : []
               content {
-                driver    = csi.value.driver
-                read_only = csi.value.readOnly
+                driver            = csi.value.driver
+                read_only         = csi.value.readOnly
                 volume_attributes = csi.value.volumeAttributes
               }
             }
