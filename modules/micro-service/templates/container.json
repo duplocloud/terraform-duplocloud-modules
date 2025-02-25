@@ -1,0 +1,5 @@
+{
+  "name": "${name}",
+  "image": "${image}",
+  "envFrom": ${env_from}
+}

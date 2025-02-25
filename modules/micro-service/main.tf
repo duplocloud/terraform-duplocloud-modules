@@ -1,98 +1,88 @@
-resource "duplocloud_k8_config_map" "this" {
-  tenant_id = var.tenant_id
-  name      = var.name
-  data      = jsonencode(var.env)
-  timeouts {
-    create = "3m"
-    update = "3m"
-    delete = "3m"
+locals {
+  tenant     = data.duplocloud_tenant.this
+  release_id = random_string.release_id.id
+  image_uri  = var.image.uri != null ? var.image.uri : "${var.image.registry}/${coalesce(var.image.repo, var.name)}:${var.image.tag}"
+  # Check if we need to look up the cert arn
+  do_cert_lookup = var.lb.enabled && var.lb.certificate != "" && !startswith(var.lb.certificate, "arn:aws:acm:")
+  cert_arn       = local.do_cert_lookup ? data.duplocloud_plan_certificate.this[0].arn : var.lb.certificate
+  # if the cert_arn is not null and the external port is null, set it to 443, else set it to 80
+  external_port = var.lb.port != null ? var.lb.port : local.cert_arn != "" ? 443 : var.lb.type == "service" ? var.port : 80
+  alb_types = {
+    "elb"                  = 0
+    "alb"                  = 1
+    "health-only"          = 2
+    "service"              = 3
+    "node-port"            = 4
+    "azure-shared-gateway" = 5
+    "nlb"                  = 6
+    "target-group"         = 7
   }
-}
-
-resource "duplocloud_duplo_service" "this" {
-  tenant_id                            = var.tenant_id
-  name                                 = var.name
-  replicas                             = var.replicas
-  lb_synced_deployment                 = false
-  cloud_creds_from_k8s_service_account = true
-  is_daemonset                         = false
-  agent_platform                       = 7
-  cloud                                = 0
-  other_docker_config = jsonencode({
-    EnvFrom = concat([
-      {
-        "configMapRef" : {
-          "name" : duplocloud_k8_config_map.this.name
-        }
-      }
-      ], [
-      for secret in var.env_secrets : {
-        secretRef : {
-          name = secret
-        }
-      }
-    ])
-    "Resources" : {},
-    "RestartPolicy" : "Always"
-    "ImagePullPolicy" : "Always",
-    "LivenessProbe" : {
-      "failureThreshold" : 3,
-      "initialDelaySeconds" : 15,
-      "periodSeconds" : 20,
-      "successThreshold" : 1,
-      "tcpSocket" : {
-        "port" : 3001
-      },
-      "timeoutSeconds" : 1
-    },
-    "PodSecurityContext" : {},
-    "ReadinessProbe" : {
-      "failureThreshold" : 3,
-      "initialDelaySeconds" : 10,
-      "periodSeconds" : 10,
-      "successThreshold" : 1,
-      "tcpSocket" : {
-        "port" : 3001
-      },
-      "timeoutSeconds" : 1
+  container_context = {
+    env_from         = jsonencode(local.env_from)
+    image            = var.image
+    port             = var.port
+    health_check     = var.health_check
+    nodeSelector     = jsonencode(var.nodes.selector)
+    restart_policy   = var.restart_policy
+    annotations      = jsonencode(var.annotations)
+    labels           = jsonencode(var.labels)
+    pod_labels       = jsonencode(var.pod_labels)
+    pod_annotations  = jsonencode(var.pod_annotations)
+    resources        = jsonencode(var.resources)
+    security_context = jsonencode(var.security_context)
+    volume_mounts    = jsonencode(local.volume_mounts)
+    volumes          = jsonencode(local.volumes)
+    command          = jsonencode(var.command)
+    args             = jsonencode(var.args)
+    env              = jsonencode(local.container_env)
+    # volumes = jsonencode(local.volumes)
+  }
+  volumes = concat([
+    for config in module.configurations : config.volume if config.volume != null
+    ], [
+    # TODO pvc volume
+  ], jsondecode(var.volumes_json))
+  volume_mounts = concat([
+    for config in module.configurations : config.volumeMount
+    if config.volumeMount != null
+  ], var.volume_mounts)
+  # for each key value in var.env make a list of objects with name and value
+  container_env = [
+    for key, value in var.env : {
+      name  = key
+      value = value
     }
-  })
-  docker_image = var.image
-  lifecycle {
-    ignore_changes = [
-      docker_image
-    ]
-  }
-}
-
-resource "duplocloud_duplo_service_lbconfigs" "this" {
-  tenant_id                   = var.tenant_id
-  replication_controller_name = duplocloud_duplo_service.this.name
-  lbconfigs {
-    lb_type          = 7
-    is_native        = false
-    is_internal      = false
-    port             = var.lb_config.port
-    external_port    = var.lb_config.port
-    protocol         = "http"
-    health_check_url = var.lb_config.health_check_url
-  }
-}
-
-resource "duplocloud_aws_lb_listener_rule" "this" {
-  tenant_id    = var.tenant_id
-  listener_arn = var.lb_config.listener_arn
-  priority     = var.lb_config.priority
-  action {
-    type             = "forward"
-    target_group_arn = duplocloud_duplo_service_lbconfigs.this.lbconfigs[0].target_group_arn
-  }
-  condition {
-    path_pattern {
-      values = [var.lb_config.path_pattern]
-    }
-  }
-  depends_on = [
-    duplocloud_duplo_service_lbconfigs.this
   ]
+  # build from the single env configmap and all of the secret names
+  env_from = concat([
+    for config in module.configurations : config.envFrom
+    if config.envFrom != null
+    ], [
+    for secret in var.secrets : {
+      secretRef : {
+        name = secret
+      }
+    }
+  ])
+}
+
+# If the tenant_id is not set, we need to look it up with the tenant data block
+data "duplocloud_tenant" "this" {
+  name = var.tenant
+}
+
+# now check for the cert arn when we need to do_cert_lookup
+data "duplocloud_plan_certificate" "this" {
+  count   = local.do_cert_lookup ? 1 : 0
+  name    = var.lb.certificate
+  plan_id = local.tenant.plan_id
+}
+
+resource "random_string" "release_id" {
+  keepers = {
+    strategy = var.release_id != null ? var.release_id : local.image_uri
+  }
+  length  = 5
+  special = false
+  upper   = false
 }

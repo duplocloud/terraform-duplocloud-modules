@@ -10,3 +10,13 @@ To run the unit tests when in a module directory:
 ```sh
 tf test -filter=tests/unit.tftest.hcl
 ```
+
+## General Usage  
+
+To use a module in your project, add the following to your `some.tf` file:  
+```hcl
+module "components" {
+  source  = "duplocloud/components/duplocloud"
+  version = "0.0.22"
+}
+```
