@@ -15,7 +15,7 @@ run "building_configurations" {
         BAZ = "buzz"
       }
       }, {
-      name      = "bubbles"
+      name        = "bubbles"
       class       = "aws-secret"
       csi         = true
       managed     = false
@@ -31,7 +31,7 @@ run "building_configurations" {
       }
       }, {
       enabled     = false
-      name      = "disabled"
+      name        = "disabled"
       class       = "aws-ssm"
       csi         = false
       managed     = true
@@ -53,7 +53,7 @@ run "building_configurations" {
   }
 
   assert {
-    condition = length(module.configurations) == 4
+    condition     = length(module.configurations) == 4
     error_message = "The configurations was not set correctly."
   }
 

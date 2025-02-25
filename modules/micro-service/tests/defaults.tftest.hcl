@@ -36,7 +36,7 @@ run "validate_defaults" {
   }
 
   assert {
-    condition = length(duplocloud_k8s_job.before_update) == 0
+    condition     = length(duplocloud_k8s_job.before_update) == 0
     error_message = "There should be no before update job by default."
   }
 
