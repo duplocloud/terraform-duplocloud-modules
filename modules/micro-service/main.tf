@@ -41,7 +41,7 @@ locals {
     for config in module.configurations : config.volume if config.volume != null
     ], [
     # TODO pvc volume
-  ], jsonencode(var.volumes_json))
+  ], jsondecode(var.volumes_json))
   volume_mounts = concat([
     for config in module.configurations : config.volumeMount
     if config.volumeMount != null
